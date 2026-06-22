@@ -2,6 +2,7 @@ import React, { useState } from "react";
 import {
   RadarChart, Radar, PolarGrid, PolarAngleAxis, PolarRadiusAxis,
   BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, Cell, LabelList,
+  ScatterChart, Scatter,
 } from "recharts";
 
 /* ──────────────────────────────────────────────────────────────────────────
@@ -191,6 +192,12 @@ const DATA = {
       { p: "Top Indian OEMs are in-housing BMS", why: "Leading 2W OEMs are building internal BMS teams to control cost and own battery data — shrinking the merchant market", sowhat: "Counter with superior safety certification and faster update cadence; target OEMs below the top tier plus fleets" },
       { p: "Chinese pack/BMS imports 25–30% cheaper", why: "Scale and vertical integration give Chinese suppliers a durable cost edge; entry via JV routes continues", sowhat: "Defend with localisation, AIS-156 safety positioning and service bundling; monitor BIS/import-policy shifts" },
     ],
+    tows: {
+      SO: "Use PS-ESB battery assets + workshop network + SdV software (S) to win pack/BMS integration partnerships with ACC-PLI awardees (O) before Chinese rivals lock those relationships.",
+      ST: "Use the workshop service network + SdV software depth (S) to offer lifecycle battery-health services that price-only Chinese imports cannot match (T) — converting the channel into a durable moat.",
+      WO: "Offset premium cost structure (W) by targeting fleet EV pilots where safety certification and BMS software command pricing premium (O) rather than fighting on cost in the 2W mass market.",
+      WT: "Mitigate the no-cells gap + cost premium (W) against OEM in-housing and Chinese imports (T) by locking PLI-winner BMS partnerships before the market window closes — speed beats cost.",
+    },
     strategy: "Lead with Battery & BMS (reuse PS-ESB + workshops + SdV software), partner into V2G/charging management with fleets and discoms, watch new-energy tech via ventures.",
     scoreRationale: "Score 6.8: three exploitable, hard-to-copy strengths (assets, software, channel) and two well-matched opportunities outweigh two structural weaknesses — but the weaknesses (cost base, no cells) directly amplify both threats, capping the score below 7.5.",
   },
@@ -293,6 +300,28 @@ const DATA = {
     { d: "May 21, 2026", t: "Discom pilot for V2G with 3W fleet operator goes live in Delhi NCR", s: "Mercom India" },
     { d: "May 14, 2026", t: "Battery Waste Mgmt Rules enforcement drive targets EPR compliance of pack makers", s: "Economic Times" },
   ],
+  stakeholders: [
+    { name: "MoHI / PM E-DRIVE / FAME Programme Office", type: "government", influence: 10, interest: 8, stance: "ally", reasoning: "PM E-DRIVE demand incentives and charging-capex allocation are the primary market-creation mechanism." },
+    { name: "ACC PLI awardees (Ola Electric, Rajesh Exports, Reliance NEU)", type: "oem", influence: 8, interest: 8, stance: "ally", reasoning: "PLI cell makers need proven pack/BMS integration partners — Bosch's primary near-term B2B opportunity." },
+    { name: "2W/3W OEMs (Ola, Ather, Hero, TVS)", type: "oem", influence: 9, interest: 8, stance: "neutral", reasoning: "BMS sourcing decision-makers; top OEMs in-housing, mid-tier remain open — segment carefully." },
+    { name: "Discoms & fleet operators", type: "consumer", influence: 6, interest: 7, stance: "ally", reasoning: "Fleet charging-management and V2G pilots — the mapped Workshop Services & Fleet BBM stream." },
+    { name: "Chinese JV BMS entrants (CATL India, BYD)", type: "supplier", influence: 7, interest: 5, stance: "blocker", reasoning: "Cost-advantage rivals entering India via JV routes; Bosch must differentiate on safety and service." },
+  ],
+  competitors: [
+    { name: "CATL (India JV entry)", type: "global", x_price_position: 3, y_tech_depth: 9, moat: "Cell + pack vertical integration + 25% cost advantage", reasoning: "The dominant competitive threat; Bosch counters with AIS-156 safety positioning and service bundling." },
+    { name: "BYD India", type: "global", x_price_position: 3, y_tech_depth: 8, moat: "Vertically integrated EV + BMS", reasoning: "OEM+BMS integration model; Bosch targets the merchant BMS market for non-BYD OEMs." },
+    { name: "Exicom / Servotech (Indian BMS/charger)", type: "indian-incumbent", x_price_position: 4, y_tech_depth: 6, moat: "India-cost charger manufacturing + local OEM trust", reasoning: "Cost-competitive in chargers; Bosch differentiates on software + functional safety." },
+    { name: "Log9 / Batt:RE (Indian BMS startups)", type: "startup", x_price_position: 4, y_tech_depth: 6, moat: "Fast product cycles + VC backing", reasoning: "Startup BMS makers moving quickly; Bosch's safety certification and scale are the counter." },
+    { name: "Bosch (target position)", type: "global", x_price_position: 6, y_tech_depth: 8, moat: "PS-ESB assets + SdV BMS SW + 10,000-workshop service network", reasoning: "System-integration + service depth — a position no pure-hardware rival can replicate." },
+  ],
+  competitorWhiteSpace: "BMS software + battery-health-as-a-service combining engineering depth with a physical workshop network — Chinese cost players lack the service; Indian startups lack the safety certification and scale.",
+  suppliers: [
+    { input: "Battery cells (LFP, NMC)", supply_risk: 8, profit_impact: 9, quadrant: "strategic", reasoning: "No India cell production at scale yet; Chinese import dependency is structural — lock ACC PLI partnerships." },
+    { input: "Power electronics (SiC MOSFETs, gate drivers)", supply_risk: 7, profit_impact: 8, quadrant: "strategic", reasoning: "SiC allocation-sensitive; coordinate with ECA field for joint supply strategy." },
+    { input: "BMS ICs / AFE chips", supply_risk: 6, profit_impact: 7, quadrant: "strategic", reasoning: "Analog front-end chips from TI/ADI/Renesas; moderate concentration risk." },
+    { input: "Thermal management materials", supply_risk: 4, profit_impact: 5, quadrant: "leverage", reasoning: "Multiple suppliers; competitive." },
+    { input: "Charging connectors / cables", supply_risk: 3, profit_impact: 4, quadrant: "non-critical", reasoning: "Commoditised; managed through procurement." },
+  ],
   sources: [
     "PIB — PM E-DRIVE scheme notification", "PLI-ACC programme & state EV policies", "Vahan EV registration dashboard",
     "Cell price index trackers", "EV consumer adoption surveys (2026)", "e-3W market penetration data",
@@ -308,7 +337,7 @@ const DATA = {
     criterionScores: [
       { ...WEIGHTS[0], s: 5.4, conf: 0.84, why: "Strong in ECUs/SW and sensing, but no luminaire/optics franchise — the core hardware competency sits with lighting Tier-1s. See Competency tab." },
       { ...WEIGHTS[1], s: 5.8, conf: 0.80, why: "SW/controller strengths are real but the field is owned by entrenched lighting specialists with locked OEM platforms. See SWOT tab." },
-      { ...WEIGHTS[2], s: 6.6, conf: 0.76, why: "Steady premiumisation-led growth (~9% CAGR) — sizeable but slower than software-centric fields. See Market tab." },
+      { ...WEIGHTS[2], s: 6.6, conf: 0.78, why: "$2.5B market at 6.2% CAGR (6Wresearch); sizeable but steady, and only the control/SW slice is Bosch-addressable. See Market tab." },
       { ...WEIGHTS[3], s: 5.6, conf: 0.82, why: "Entrenched incumbents, strong buyer power, platform lock-ins — a hard field to break into mid-cycle. See Attractiveness tab." },
       { ...WEIGHTS[4], s: 7.4, conf: 0.83, why: "Lighting is becoming software (adaptive, personalised, communicative) — the SW layer is where growth concentrates. See 3 Horizons tab." },
     ],
@@ -337,24 +366,31 @@ const DATA = {
         { p: "Entrenched incumbents with locked multi-year platform awards", why: "Lumax, Uno Minda, Varroc, Fiem plus global JVs hold long-cycle OEM platform contracts; displacement mid-cycle is rare", sowhat: "Time entry to new platform RFQs (EV platforms especially); don't fight existing awards" },
         { p: "Lighting Tier-1s building their own electronics/SW teams", why: "Incumbents see the same software shift and are hiring; the partnership window narrows over time", sowhat: "Move within 12–18 months or the SW-partner slot gets filled" },
       ],
+      tows: {
+        SO: "Use ADAS-camera + SdV software assets (S) to lead adaptive/matrix lighting CONTROL as BNCAP pulls these features into mass segments (O) — win the software layer on existing hardware sockets.",
+        ST: "Use the SdV/cybersecurity software depth (S) to become the integration partner lighting Tier-1s lack (T), converting a competitive threat into a partnership rather than a head-on fight.",
+        WO: "Offset the absent optics/luminaire franchise (W) by partnering an incumbent lamp maker to capture the BNCAP-driven adaptive-lighting opportunity (O) — Bosch control + partner optics.",
+        WT: "Mitigate no-optics-franchise + no-M&A-hooks (W) against entrenched, software-building incumbents (T) by moving within 12–18 months to lock the SW-partner slot before it closes; avoid any lamp-hardware bet.",
+      },
       strategy: "Do not build lamps. Enter the control & Application-SW layer (auto-dimming, matrix control, personalisation) on the back of existing ADAS/SdV assets, partnering with an incumbent lamp maker for optics and homologation.",
       scoreRationale: "Score 5.8: genuine, reusable SW strengths but both weaknesses are structural (no optics franchise, no M&A hooks) and the threats are timing-sensitive. Net position is workable only with a narrow, software-scoped entry.",
     },
     market: {
-      tam: 3800, sam: 900, cagr: 9, year: 2030,
+      tam: 2500, sam: 620, cagr: 6.2, year: 2030,
       derivation: [
-        { step: "India automotive lighting market 2030 (all segments)", value: "$3.8B", src: "Industry reports triangulated [7]" },
-        { step: "Electronics + software content share (controllers, drivers, SW)", value: "~32% and rising", src: "Teardown benchmarks; estimate [4]" },
-        { step: "Serviceable filter: controller/SW layer + adaptive systems, Bosch-addressable", value: "≈24% of TAM", src: "Excludes luminaires/optics; estimate" },
-        { step: "= SAM (2030)", value: "$0.9B", src: "Derived — estimate" },
+        { step: "India automotive lighting market 2025 (all segments)", value: "$1.64B", src: "Renub/Research&Markets; 6Wresearch base [7]" },
+        { step: "× 6.2% CAGR over the 2025–2031 forecast period", value: "→ ~$2.5B by 2030", src: "6Wresearch internal database & industry insights (CAGR 6.2%, 2025–2031) [7]" },
+        { step: "Electronics + software content share (controllers, drivers, adaptive SW)", value: "~32% and rising", src: "Teardown benchmarks; estimate [4]" },
+        { step: "Serviceable filter: control/SW layer + adaptive-system electronics, Bosch-addressable (excl. luminaires/optics)", value: "≈25% of TAM", src: "Bosch-addressable scope; estimate" },
+        { step: "= SAM (2030)", value: "~$0.62B", src: "Derived — estimate" },
       ],
-      crossCheck: "Sanity check: content-per-vehicle (~$95 avg lighting, of which ~$30 electronics/SW) × ~30M vehicle production lands in the same corridor as the report-based TAM [2][7].",
+      crossCheck: "Cross-check: Mordor pegs the market at ~$2.31B by 2030 (5.87% CAGR) and Renub/R&M at $2.78B by 2034 (6.02%); 6Wresearch's 6.2% on a $1.64B 2025 base lands ~$2.2–2.5B by 2030 — a $2.5B TAM sits at the credible upper-middle of independent estimates [7].",
       customers: [
         { s: "PV & 2W OEMs", buy: "Lighting control ECUs, adaptive-beam SW, personalisation features", note: "Buy at platform sourcing — time entry to new EV platforms" },
         { s: "Lighting Tier-1s", buy: "Domain integration, cybersecurity, OTA frameworks", note: "Partner channel — they need SDV plumbing" },
         { s: "Aftermarket", buy: "Retrofit & accessory lighting electronics", note: "Bosch retail network is a niche channel" },
       ],
-      scoreRationale: "Score 6.6: a $3.8B field but only ~$0.9B is realistically Bosch-addressable and growth (9%) is GDP-plus, not exponential. Confidence 0.76: market reports agree on size, but the SW-share split is our estimate.",
+      scoreRationale: "Score 6.6: a $2.5B field (6.2% CAGR, 6Wresearch) but only ~$0.62B is realistically Bosch-addressable (control/SW layer), and growth is steady GDP-plus rather than exponential. Confidence 0.78: market size now triangulated across 6Wresearch, Mordor and Renub; the SW-share split remains a Bosch estimate.",
     },
     porter: [
       { force: "Rivalry", v: 7.0, why: "Four strong Indian incumbents plus global JVs compete on locked platform awards; price pressure is constant but capacity discipline keeps it from being destructive.", drivers: ["Lumax/Minda/Varroc/Fiem + global JVs", "Platform-cycle competition", "Price-down clauses"], c: [8] },
@@ -402,6 +438,28 @@ const DATA = {
       { d: "May 19, 2026", t: "BNCAP round results push two OEMs to announce auto high-beam across model lines", s: "Autocar Pro" },
       { d: "May 06, 2026", t: "2W maker ships app-controlled welcome-light personalisation via OTA", s: "Bike Dekho" },
     ],
+    stakeholders: [
+      { name: "MoRTH / BNCAP", type: "regulator", influence: 9, interest: 7, stance: "ally", reasoning: "Safety-rating and visibility norms pull adaptive lighting forward; a regulator whose agenda aligns with Bosch's control-SW offer." },
+      { name: "PV & 2W OEMs", type: "oem", influence: 9, interest: 8, stance: "neutral", reasoning: "Decide sourcing at platform level; treat lighting as cost-plus-differentiation — must be won feature-by-feature." },
+      { name: "Lighting Tier-1s (Lumax, Uno Minda, Varroc, Fiem)", type: "supplier", influence: 7, interest: 6, stance: "neutral", reasoning: "Own optics & OEM relationships; potential partners for the control layer or competitors if they build SW in-house." },
+      { name: "Bosch internal (Mobility BUs)", type: "oem", influence: 6, interest: 8, stance: "ally", reasoning: "ADAS/SdV teams supply the camera data and compute the lighting-control offer rides on." },
+      { name: "End consumers", type: "consumer", influence: 5, interest: 5, stance: "ally", reasoning: "Increasingly value signature/personalised lighting — willingness-to-pay for experience SW." },
+    ],
+    competitors: [
+      { name: "Lumax Industries", type: "indian-incumbent", x_price_position: 6, y_tech_depth: 7, moat: "OEM relationships + Stanley/Valeo alliances; dominant lamp share", reasoning: "Leads on optics & platform awards; thinner on SDV-grade software — the gap Bosch targets." },
+      { name: "Uno Minda", type: "indian-incumbent", x_price_position: 5, y_tech_depth: 6, moat: "Broad component portfolio + scale", reasoning: "Cost-competitive lamp maker expanding into electronics; a likely both-partner-and-rival." },
+      { name: "Varroc Lighting", type: "indian-incumbent", x_price_position: 6, y_tech_depth: 7, moat: "Global lighting engineering footprint", reasoning: "Strong on lamp engineering; SDV software integration is the white space." },
+      { name: "Global Tier-1s (Marelli, ZKW/Magna, Koito)", type: "global", x_price_position: 8, y_tech_depth: 9, moat: "Matrix/laser optics IP", reasoning: "Premium optics leaders, but cost structure and India SW localisation favour a Bosch SW partnership." },
+      { name: "Bosch (target position)", type: "global", x_price_position: 7, y_tech_depth: 8, moat: "ADAS/SdV software + cross-domain compute", reasoning: "Enters at the control/Application-SW layer, not optics — the differentiated quadrant." },
+    ],
+    competitorWhiteSpace: "The high-tech-depth / software-defined quadrant is largely unoccupied by lamp incumbents — adaptive-lighting CONTROL + personalisation SW is the white space Bosch can own without an optics franchise.",
+    suppliers: [
+      { input: "LED chips & packages", supply_risk: 4, profit_impact: 6, quadrant: "leverage", reasoning: "Broad Asian supply base; competitive — manage on price/multi-sourcing, low risk." },
+      { input: "LED driver ICs", supply_risk: 5, profit_impact: 6, quadrant: "leverage", reasoning: "Several vendors; moderate impact on cost and performance." },
+      { input: "Automotive MCUs / lighting controllers", supply_risk: 7, profit_impact: 8, quadrant: "strategic", reasoning: "Allocation-sensitive and performance-critical — strategic supplier relationships needed (shared with ECA field)." },
+      { input: "Optics / lens & reflector tooling", supply_risk: 6, profit_impact: 7, quadrant: "bottleneck", reasoning: "Specialised tooling concentrated with lamp Tier-1s — the reason to partner rather than build optics." },
+      { input: "Thermal-management parts", supply_risk: 3, profit_impact: 4, quadrant: "non-critical", reasoning: "Commoditised; low risk and impact." },
+    ],
     sources: ["MoRTH/BNCAP visibility norms", "Lighting content-per-vehicle benchmarks", "OEM feature marketing analysis", "Matrix LED architecture briefings", "LED efficiency studies", "AIS homologation requirements", "India lighting market reports", "Tier-1 annual reports & platform awards"],
   },
 
@@ -439,6 +497,12 @@ const DATA = {
         { p: "Consumer-electronics giants (Samsung/Harman, LG, Chinese cockpit Tier-1s) attacking the same OEMs", why: "They bring display supply chains, brand UX credibility and aggressive pricing", sowhat: "Differentiate on automotive-grade integration, safety co-domains and privacy — not on display hardware" },
         { p: "OEMs in-housing HMI/UX layers", why: "Top OEMs hire UX teams to own brand experience, demoting suppliers to platform providers", sowhat: "Embrace it: sell the platform + tooling (bring-your-own-pattern), monetise the base layers" },
       ],
+      tows: {
+        SO: "Use HPC heritage + India SW scale (S) to build the pre-integrated cockpit stack + vernacular AI assistant Indian OEMs need (O) — deliver what no incumbent can match at India cost.",
+        ST: "Use automotive-grade integration depth + India SW org (S) to compete on safety co-domains and privacy that consumer-electronics attackers lack (T) — differentiate on trust, not display hardware.",
+        WO: "Overcome UX-polish gap (W) by partnering a UX design studio to deliver the vernacular-AI assistant opportunity before consumer-electronics rivals own that socket (O).",
+        WT: "Mitigate UX gap + SoC dependency (W) against consumer-electronics giants and OEM in-housing (T) by selling the cockpit platform layer and tooling — embracing bring-your-own-HMI rather than fighting the UX battle.",
+      },
       strategy: "Lead as the integrated cockpit platform & AI-experience provider for India: cockpit HPC + pre-integrated SW bundle + vernacular AI assistant, with a silicon alliance and a UX capability acquisition.",
       scoreRationale: "Score 7.4: two heavyweight, hard-to-copy strengths and two well-evidenced opportunities; weaknesses are real but both have named closure routes (UX acquisition, SoC alliance). Threats moderate the score below 8.",
     },
@@ -506,6 +570,26 @@ const DATA = {
       { d: "May 22, 2026", t: "Consumer-electronics Tier-1 wins twin-display award at Indian OEM, displacing incumbent", s: "Autocar Pro" },
       { d: "May 10, 2026", t: "Premium 2W brand ships TFT cluster with OTA app store", s: "Bike Dekho" },
     ],
+    stakeholders: [
+      { name: "PV OEMs (Maruti, Hyundai, Tata, M&M)", type: "oem", influence: 9, interest: 9, stance: "neutral", reasoning: "Award the cockpit platform; decision moves to CDO/software orgs — Bosch must win the SW buyer, not just the procurement team." },
+      { name: "Qualcomm / MediaTek", type: "supplier", influence: 8, interest: 7, stance: "neutral", reasoning: "SoC roadmaps gate Bosch's cockpit differentiation; a silicon alliance is both dependency and leverage." },
+      { name: "Bhashini / MeitY", type: "government", influence: 6, interest: 5, stance: "ally", reasoning: "Open language-AI APIs lower Bosch's cost of a vernacular assistant and provide policy alignment." },
+      { name: "Consumer-tech buyers (OEM digital teams)", type: "oem", influence: 7, interest: 8, stance: "neutral", reasoning: "CDOs benchmark against phone UX — Bosch must speak their language, not just Tier-1 procurement language." },
+    ],
+    competitors: [
+      { name: "Harman (Samsung)", type: "global", x_price_position: 8, y_tech_depth: 8, moat: "Consumer UX + display supply chain + Samsung ecosystem", reasoning: "Consumer-brand credibility that automotive Tier-1s lack; Bosch counters with safety co-domain integration." },
+      { name: "Visteon", type: "global", x_price_position: 7, y_tech_depth: 8, moat: "Cockpit-only focus; deep OEM cockpit relationships", reasoning: "Pure-play cockpit Tier-1; lacks Bosch's ADAS/SdV cross-domain advantage." },
+      { name: "KPIT Technologies", type: "indian-incumbent", x_price_position: 5, y_tech_depth: 7, moat: "India OEM relationships + cockpit middleware", reasoning: "Competes on services and India cost; Bosch counters with product IP and integration accountability." },
+      { name: "Tata Elxsi", type: "indian-incumbent", x_price_position: 5, y_tech_depth: 7, moat: "OEM design partnerships + UI/UX capability", reasoning: "Strong UX and design — the specific gap Bosch needs to close via acquisition or partnership." },
+      { name: "Bosch (target position)", type: "global", x_price_position: 7, y_tech_depth: 9, moat: "Cross-domain HPC + India SW scale + ADAS integration", reasoning: "Targets the integrated platform layer where pure cockpit and pure services rivals can't follow." },
+    ],
+    competitorWhiteSpace: "Pre-integrated cockpit + ADAS fusion platform with vernacular AI assistant at India cost — no incumbent covers all three; the integrated-stack position is the white space.",
+    suppliers: [
+      { input: "Cockpit SoC (Qualcomm/MediaTek)", supply_risk: 8, profit_impact: 9, quadrant: "strategic", reasoning: "Single most critical dependency — silicon roadmap gates feature delivery; formalise preferred-silicon alliance." },
+      { input: "Display panels", supply_risk: 5, profit_impact: 6, quadrant: "leverage", reasoning: "Multiple Korean/Chinese panel makers; competitive supply, moderate impact." },
+      { input: "Language AI APIs (Bhashini, cloud LLMs)", supply_risk: 4, profit_impact: 7, quadrant: "leverage", reasoning: "Open-source and government APIs reduce dependency; differentiation is in integration, not model access." },
+      { input: "UX design studios", supply_risk: 5, profit_impact: 7, quadrant: "bottleneck", reasoning: "Consumer-grade UX talent is concentrated; key bottleneck to close the phone-grade gap." },
+    ],
     sources: ["Bhashini / language-AI ecosystem", "Cockpit content-per-vehicle teardowns", "Buyer-experience surveys & NPS studies", "Cockpit SoC roadmaps", "EV power-budget engineering notes", "DPDP Act application to in-cabin data", "PV/2W production forecasts", "Cockpit competitive award trackers"],
   },
 
@@ -543,6 +627,12 @@ const DATA = {
         { p: "Low-cost camera-DMS startups commoditising monitoring", why: "Smartphone-derived camera + edge-AI stacks ship at aggressive prices for fleet retrofits", sowhat: "Differentiate on automotive-grade reliability, radar fusion and OEM-line integration; cede the cheap retrofit tier" },
         { p: "Seat Tier-1s integrating sensing themselves", why: "Seat makers add occupancy/comfort sensing to defend their system award scope", sowhat: "Offer them the sensing layer as a partner before they build it" },
       ],
+      tows: {
+        SO: "Use interior-sensing portfolio + actuator/motor assets (S) to be the certified supplier for child-presence detection and DMS when regulation mandates land (O) — regulation-timing advantage.",
+        ST: "Use automotive-grade radar fusion + sensing reliability (S) to differentiate against low-cost camera DMS startups (T) who lack the integration quality OEMs need for safety-rating compliance.",
+        WO: "Overcome the no-seating-franchise gap (W) by partnering seat Tier-1s to supply them the AQI sensing layer before they build it themselves (O) — become their sensing partner, not their competitor.",
+        WT: "Mitigate no-seating-franchise + no-wellness-brand (W) against seat Tier-1s integrating sensing (T) by offering the sensing layer proactively as a partnership before incumbents close the socket.",
+      },
       strategy: "Lead occupant & driver monitoring (regulation-timed), supply comfort actuators and air-quality sensing as component/SW layers to incumbents, and stay out of complete seats and consumer scent.",
       scoreRationale: "Score 6.2: two strong, asset-backed strengths and a genuine regulatory opportunity, but the field's largest revenue pools (complete seating) sit behind a structural weakness. Net position good only with strict sub-field selection.",
     },
@@ -613,6 +703,26 @@ const DATA = {
       { d: "May 18, 2026", t: "Global NCAP roadmap adds child-presence detection timeline relevant to BNCAP", s: "Autocar Pro" },
       { d: "May 08, 2026", t: "DMS startup announces low-cost retrofit deal with logistics fleet", s: "Mint" },
     ],
+    stakeholders: [
+      { name: "MoRTH / BNCAP / Global NCAP", type: "regulator", influence: 9, interest: 7, stance: "ally", reasoning: "DMS and child-presence detection mandates are the primary demand trigger for Bosch's sensing offer." },
+      { name: "PV OEMs", type: "oem", influence: 9, interest: 8, stance: "neutral", reasoning: "Award interior sensing as part of platform decisions; key is getting into safety-feature RFQs early." },
+      { name: "Seat Tier-1s (Adient, Lear, TS Tech)", type: "supplier", influence: 7, interest: 6, stance: "neutral", reasoning: "Own complete-seat awards; potential partners for sensing supply or competitors if they integrate sensors." },
+      { name: "Indian air-quality agencies (CPCB)", type: "government", influence: 5, interest: 4, stance: "ally", reasoning: "AQI data and government communication validate the air-purity feature narrative for Indian buyers." },
+    ],
+    competitors: [
+      { name: "Seeing Machines", type: "global", x_price_position: 7, y_tech_depth: 8, moat: "DMS algorithm IP + fleet & automotive references", reasoning: "Specialist DMS provider; Bosch counters with radar fusion and automotive-grade integration." },
+      { name: "Smart Eye", type: "global", x_price_position: 7, y_tech_depth: 8, moat: "Eye-tracking algorithms + OEM relationships", reasoning: "Pure-play gaze/monitoring; Bosch's 60GHz radar fusion is differentiated in low-light conditions." },
+      { name: "Valeo (sensing/DMS)", type: "global", x_price_position: 7, y_tech_depth: 8, moat: "Full-system interior sensing + ADAS integration", reasoning: "Broad competitor; Bosch's ADAS-native platform is the counterweight." },
+      { name: "Local DMS startups (Netradyne adjacency)", type: "startup", influence: 4, x_price_position: 4, y_tech_depth: 6, moat: "Low-cost camera + edge AI for fleet retrofit", reasoning: "Fleet-retrofit tier; Bosch cedes this, focuses on OEM-line integration." },
+      { name: "Bosch (target position)", type: "global", x_price_position: 7, y_tech_depth: 9, moat: "60GHz radar + ADAS fusion + India manufacturing", reasoning: "Radar-fused DMS + AQI sensing bundle — differentiated from camera-only rivals." },
+    ],
+    competitorWhiteSpace: "Radar-fused DMS + AQI sensing as a bundled, OEM-line system — no incumbent packages both; Bosch's radar and ADAS assets create a unique combined offer.",
+    suppliers: [
+      { input: "60GHz in-cabin radar", supply_risk: 6, profit_impact: 8, quadrant: "strategic", reasoning: "Bosch's core sensing IP; internal and NXP-sourced — manage supply continuity carefully." },
+      { input: "Camera modules (DMS)", supply_risk: 5, profit_impact: 6, quadrant: "leverage", reasoning: "Multiple automotive camera suppliers; competitive." },
+      { input: "AQI / PM2.5 sensors", supply_risk: 4, profit_impact: 5, quadrant: "leverage", reasoning: "Several MEMS sensor vendors; manageable." },
+      { input: "Seat actuators & motors", supply_risk: 5, profit_impact: 6, quadrant: "leverage", reasoning: "Adjacent to Bosch EM portfolio; moderate supply risk." },
+    ],
     sources: ["BNCAP/UNECE DDAW trajectories", "Comfort-feature penetration data", "Cabin air-quality consumer studies", "60GHz in-cabin radar briefings", "EV power-budget notes", "DPDP biometric guidance", "Interior-systems market reports", "DMS competitive landscape"],
   },
 
@@ -650,6 +760,12 @@ const DATA = {
         { p: "Damper incumbents bundling their own electronics + SW", why: "ZF/Tenneco sell complete corner modules with control included", sowhat: "Compete via OEM-side architecture wins (central compute) rather than corner-module fights" },
         { p: "OEMs deprioritising ride tech against ADAS/EV spend", why: "Engineering budgets favour electrification and safety; suspension upgrades slip", sowhat: "Tie ride features to ADAS programmes already funded — don't sell standalone" },
       ],
+      tows: {
+        SO: "Use VMM software + ADAS road-preview data (S) to embed preview-comfort and roll-mitigation as SdV features in the premium-SUV segment growing now (O) — software unlock on existing sensor hardware.",
+        ST: "Use VMM cross-domain architecture position (S) to win central-compute OEM architecture decisions rather than fighting corner-module battles with damper incumbents bundling SW (T).",
+        WO: "Offset the tiny India volume base (W) by attaching ride-control features to ADAS/SdV OEM programmes already funded and in motion (O) — no standalone business-case required.",
+        WT: "Mitigate no-hardware franchise + micro volume base (W) against damper incumbents and OEM budget deprioritisation (T) by selling ride features as included capabilities inside funded SdV deals — zero incremental spend for OEMs.",
+      },
       strategy: "Software-and-compute-only posture: sell cross-domain ride control (preview damping, roll mitigation, motion-sickness reduction) inside VMM/SdV platform deals; partner for all damper hardware; revisit hardware stance only if the market inflects.",
       scoreRationale: "Score 5.6: credible software strengths but the market-size weakness is structural and both threats squeeze the niche from opposite sides. Net position is a patient, software-scoped play.",
     },
@@ -715,6 +831,23 @@ const DATA = {
       { d: "May 13, 2026", t: "EV flagship review highlights body-control challenge of 2.4t kerb weight", s: "Autocar Pro" },
       { d: "May 02, 2026", t: "OEM platform briefing shows chassis functions migrating to central computer", s: "Auto Tech Review" },
     ],
+    stakeholders: [
+      { name: "Premium PV OEMs (BMW India, Hyundai N, M&M XUV)", type: "oem", influence: 9, interest: 7, stance: "neutral", reasoning: "Primary buyers of active/semi-active suspension SW; award decisions at platform sourcing in premium segments." },
+      { name: "ZF / Tenneco / BWI", type: "supplier", influence: 8, interest: 5, stance: "neutral", reasoning: "Own damper hardware and incumbent SW; potential channel partners for Bosch VMM software, or rivals." },
+      { name: "Bosch ADAS BU (internal)", type: "oem", influence: 7, interest: 9, stance: "ally", reasoning: "Provides the road-preview sensor data that makes preview-comfort possible — natural internal ally." },
+    ],
+    competitors: [
+      { name: "ZF (CDC / active suspension)", type: "global", x_price_position: 8, y_tech_depth: 9, moat: "Continuous Damping Control IP + hardware + SW bundle", reasoning: "Complete corner-module with embedded control; Bosch competes at the central-compute layer above." },
+      { name: "Tenneco (Monroe Intelligent Suspension)", type: "global", x_price_position: 7, y_tech_depth: 8, moat: "Semi-active valve IP + OEM integration", reasoning: "Sells the hardware + control together; Bosch's angle is cross-domain functions that span beyond the damper." },
+      { name: "BWI Group", type: "global", x_price_position: 6, y_tech_depth: 8, moat: "MagneRide + semi-active portfolio", reasoning: "Another complete-module supplier; same dynamics." },
+      { name: "Bosch (target position)", type: "global", x_price_position: 7, y_tech_depth: 8, moat: "VMM cross-domain software + ADAS data feed", reasoning: "Enters at the central-compute / cross-domain SW layer, not the damper — differentiated positioning." },
+    ],
+    competitorWhiteSpace: "Cross-domain ride control sold as an SdV feature (not a damper accessory) — no incumbent packages preview-comfort + roll-mitigation + motion-sickness reduction as a software-defined OTA-updatable function.",
+    suppliers: [
+      { input: "Damper hardware (strategic partner supply)", supply_risk: 6, profit_impact: 5, quadrant: "bottleneck", reasoning: "Bosch doesn't build dampers; must partner ZF/Tenneco/BWI — they are both channel and supplier." },
+      { input: "ADAS camera/radar data feed", supply_risk: 3, profit_impact: 8, quadrant: "strategic", reasoning: "Internal Bosch supply — the core input that makes preview-comfort possible; low risk, high impact." },
+      { input: "Automotive MCUs (chassis domain)", supply_risk: 6, profit_impact: 7, quadrant: "strategic", reasoning: "High-performance MCU supply for cross-domain compute is allocation-sensitive." },
+    ],
     sources: ["Road-investment & quality data", "Semi-active penetration by price band", "Premium-buyer comfort studies", "VMM/cross-domain architecture briefings", "EV mass & energy analyses", "ISO 26262 chassis trends", "Premium PV segment forecasts", "Active-suspension market reports"],
   },
 
@@ -728,7 +861,10 @@ const DATA = {
       { ...WEIGHTS[4], s: 8.6, conf: 0.88, why: "Cyber regulation now, federated data & SDV platforms next, quantum-safe later — full-spectrum pipeline. See 3 Horizons tab." },
     ],
     pestel: {
-      Political: [{ p: "AIS-189/190 bring UNECE-style cybersecurity & software-update management to India", why: "CSMS/SUMS requirements make certified security processes a homologation precondition for connected vehicles [1]", sowhat: "Cybersecurity engineering becomes mandatory spend by every OEM — a compliance-pulled services and product market Bosch is built for", i: "high", c: [1] }],
+      Political: [
+        { p: "AIS-189/190 bring UNECE-style cybersecurity & software-update management to India", why: "CSMS/SUMS requirements make certified security processes a homologation precondition for connected vehicles [1]", sowhat: "Cybersecurity engineering becomes mandatory spend by every OEM — a compliance-pulled services and product market Bosch is built for", i: "high", c: [1] },
+        { p: "Govt de-licensed the 5.9 GHz band (5875–5905 MHz) for C-V2X OBUs — a regulatory ENABLER, not a demand driver", why: "In June 2026 the WPC exempted C-V2X On-Board Units (PC5 direct/V2V mode) from spectrum licensing, issued alongside the 77–81 GHz radar exemption — bringing India in line with US/EU. Customers don't buy connectivity because of it; it removes a barrier and de-risks deployment [9]", sowhat: "Improves the attractiveness and feasibility of future V2X-related opportunities (vehicle-side stacks, RSUs, safety corridors) rather than creating immediate revenue — strengthens the Infrastructure-field V2X thesis and Bosch's both-sides-of-the-air-gap position", i: "high", enabler: true, c: [9] },
+      ],
       Economic: [{ p: "Connected features shift from premium option to default expectation", why: "Embedded SIM penetration in new PVs has climbed steeply; OEMs monetise subscriptions and need data infrastructure to do it [2]", sowhat: "Recurring-revenue offboard services (the mapped M&A hook) scale with the connected parc, not just new sales", i: "high", c: [2] }],
       Social: [{ p: "Indian consumers adopt connected services fast but churn on price", why: "High app engagement, low willingness to pay post-trial — monetisation needs bundling with insurance, charging, service [3]", sowhat: "Design service bundles (workshop, battery, insurance integration) rather than standalone subscriptions — plays to Bosch's workshop stream", i: "medium", c: [3] }],
       Technological: [{ p: "SDV data architectures + federated mobility data are the build-out frontier", why: "OEMs need vehicle data platforms; India DPI thinking (Beckn-style open networks) extends to mobility data exchanges [4]", sowhat: "The mapped 'Data Management' and 'Architectures' sub-fields align with where Indian digital infrastructure is uniquely ambitious", i: "high", c: [4] }],
@@ -752,6 +888,12 @@ const DATA = {
         { p: "Hyperscalers moving up-stack into automotive verticals", why: "Connected-vehicle platforms from cloud giants compress the middleware value Bosch targets", sowhat: "Differentiate on automotive domain depth, embedded integration and regulatory compliance" },
         { p: "Indian IT majors (TCS, Infosys, Tech Mahindra) selling connected-vehicle programmes", why: "They bring OEM relationships and labour-cost advantage to services", sowhat: "Compete on product IP + accountability for outcomes, not T&M services" },
       ],
+      tows: {
+        SO: "Use security engineering culture + end-to-end device-to-cloud stack (S) to lock multi-year CSMS/SUMS compliance contracts during the AIS-189/190 regulatory window (O) — move before Indian IT majors commoditise compliance services.",
+        ST: "Use device-to-cloud coverage + automotive domain depth (S) to differentiate against hyperscalers moving up-stack (T) on compliance accountability and embedded integration they cannot replicate from outside the vehicle.",
+        WO: "Partner hyperscalers for raw infrastructure (W) while positioning Bosch at the domain-logic layer for co-architecting India's federated mobility-data network (O) — own the intelligence, rent the compute.",
+        WT: "Mitigate non-hyperscaler infra + consumer-UX gaps (W) against IT-major price wars and cloud giants (T) by competing only on product IP and compliance outcomes where T&M cost comparison is irrelevant.",
+      },
       strategy: "Lead cybersecurity & software-update compliance now, build the vehicle data platform business on it, and co-architect India's federated mobility-data layer; partner hyperscalers for infrastructure.",
       scoreRationale: "Score 7.6: rare full-stack strength alignment plus a regulation-pulled opportunity; weaknesses are layer-boundaries (infra, consumer UX) with clear partner/build routes. Threats are serious but Bosch holds differentiated ground.",
     },
@@ -821,7 +963,7 @@ const DATA = {
       { d: "May 20, 2026", t: "Open mobility-data network pilot expands to vehicle telematics in two states", s: "Mint" },
       { d: "May 09, 2026", t: "CERT-In advisory on connected-vehicle vulnerabilities prompts OEM security audits", s: "Economic Times" },
     ],
-    sources: ["AIS-189/190 drafts & UNECE R155/156", "Embedded connectivity penetration data", "Connected-services churn studies", "Beckn/DPI mobility extensions", "Vehicle data volume analyses", "DPDP + CERT-In directives", "Connected-car market reports", "Competitive landscape trackers"],
+    sources: ["AIS-189/190 drafts & UNECE R155/156", "Embedded connectivity penetration data", "Connected-services churn studies", "Beckn/DPI mobility extensions", "Vehicle data volume analyses", "DPDP + CERT-In directives", "Connected-car market reports", "Competitive landscape trackers", "WPC 5.9 GHz C-V2X OBU de-licensing notification, June 2026 (G.S.R. notification under Indian Telegraph Act 1885 / Wireless Telegraphy Act 1933)"],
   },
 
   eca: {
@@ -858,6 +1000,12 @@ const DATA = {
         { p: "SoC vendors absorbing ECU value into central compute silicon", why: "As functions consolidate onto big SoCs, value shifts from many ECUs to few chips owned by silicon vendors", sowhat: "Move up (architecture, SW, integration) and down (ASIC/chiplet partnerships) simultaneously" },
         { p: "OEM in-housing of E/E architecture design", why: "Top OEMs build architecture teams to control their destiny, demoting Tier-1s to build-to-print", sowhat: "Offer co-development models; monetise IP and tooling rather than only hardware" },
       ],
+      tows: {
+        SO: "Use zonal architecture leadership + ECU/MEMS franchise (S) to win aggressive bids on Indian EV platform zonal controllers during the once-a-decade E/E re-sourcing window (O) — incumbency resets and Bosch's architecture knowhow is the scarce asset.",
+        ST: "Use cross-domain architecture + MEMS/ECU depth (S) to position as the integration-and-qualification integrator above the SoC (T) — moving up the value stack before silicon vendors absorb it.",
+        WO: "Overcome sub-critical India design scale (W) by anchoring the ISM automotive-qualification white space (O) using DLI incentives to build/acqui-hire chip-design teams — government alignment converts the weakness into an opportunity.",
+        WT: "Mitigate fab-absent + sub-critical design (W) against SoC absorption and OEM in-housing (T) by staying indispensable at the architecture/integration layer where both silicon vendors and OEM captives need a trusted neutral partner.",
+      },
       strategy: "Lead the zonal/central-compute transition on Indian platforms, anchor automotive qualification of ISM silicon, hold the power-semiconductor line with Energy-field coordination, and watch RISC-V for sovereignty-driven programmes.",
       scoreRationale: "Score 6.8: two franchise-grade strengths and a genuine once-a-decade opportunity, tempered by the structural fab gap and value migration toward SoC vendors. Strong but contested ground.",
     },
@@ -930,6 +1078,26 @@ const DATA = {
       { d: "May 17, 2026", t: "DIR-V programme update: automotive-grade RISC-V core evaluation kits released", s: "Economic Times" },
       { d: "May 07, 2026", t: "Tier-1 wins central-computer award at global OEM's India-built platform", s: "ET Auto" },
     ],
+    stakeholders: [
+      { name: "MeitY / ISM (India Semiconductor Mission)", type: "government", influence: 9, interest: 8, stance: "ally", reasoning: "ISM DLI incentives and fab approvals shape the India semiconductor ecosystem Bosch qualifies — direct policy ally." },
+      { name: "PV/2W/CV OEMs (E/E architecture teams)", type: "oem", influence: 9, interest: 9, stance: "neutral", reasoning: "Zonal-architecture decisions are multi-year commitments; winning the blueprint wins the sockets." },
+      { name: "SoC vendors (Qualcomm, NVIDIA, MediaTek)", type: "supplier", influence: 8, interest: 7, stance: "neutral", reasoning: "Central-compute silicon; dependency and coopetition — Bosch must position above, not against." },
+      { name: "Indian chip-design GCCs (Qualcomm, NXP, Intel India)", type: "supplier", influence: 6, interest: 5, stance: "neutral", reasoning: "Talent pool for acqui-hire; partners or talent source for Bosch India design scale-up." },
+    ],
+    competitors: [
+      { name: "Continental (VDC / E/E architecture)", type: "global", x_price_position: 7, y_tech_depth: 9, moat: "Full E/E architecture portfolio + domain controller leadership", reasoning: "The closest global peer; competes on architecture and domain controllers." },
+      { name: "ZF (ZF ProAI / compute platform)", type: "global", x_price_position: 7, y_tech_depth: 8, moat: "Central compute + ADAS integration", reasoning: "Moving up from chassis into compute; overlaps with Bosch vehicle-computer strategy." },
+      { name: "Qualcomm / NVIDIA (silicon-led architecture)", type: "global", x_price_position: 9, y_tech_depth: 10, moat: "Leading-edge SoC + OEM software platforms", reasoning: "The value-absorption threat; Bosch must stay above as the architecture integrator." },
+      { name: "Tata Elxsi / LTTS (E/E consulting)", type: "indian-incumbent", x_price_position: 4, y_tech_depth: 6, moat: "India OEM relationships + E/E consulting", reasoning: "Services-led; Bosch counters with product IP and engineering accountability." },
+      { name: "Bosch (target position)", type: "global", x_price_position: 7, y_tech_depth: 9, moat: "Zonal architecture IP + ECU/MEMS franchise + India manufacturing", reasoning: "Defends ECU base, leads zonal transition, anchors ISM qualification — multi-layer position." },
+    ],
+    competitorWhiteSpace: "Automotive qualification of Indian ISM silicon — no incumbent owns this role yet; being the first to certify India-fab parts for series production creates a defensible, government-aligned moat.",
+    suppliers: [
+      { input: "Automotive SoCs (Qualcomm/NVIDIA class)", supply_risk: 9, profit_impact: 9, quadrant: "strategic", reasoning: "Most critical external dependency; allocation risk is structural — manage via multi-source and ASIC/chiplet strategy." },
+      { input: "MEMS sensors (internal + STMicro/Infineon)", supply_risk: 5, profit_impact: 7, quadrant: "leverage", reasoning: "Bosch is itself a MEMS leader; partial internal supply reduces risk." },
+      { input: "SiC/GaN power semiconductors", supply_risk: 7, profit_impact: 8, quadrant: "strategic", reasoning: "EV power electronics; supply constrained and performance-critical — coordinate with Energy field." },
+      { input: "PCB / OSAT (OSATs in India)", supply_risk: 5, profit_impact: 5, quadrant: "leverage", reasoning: "India OSAT ecosystem growing; lower risk than offshore assembly." },
+    ],
     sources: ["ISM project approvals & DLI scheme", "E/E content-per-vehicle curves", "Chip-shortage impact retrospectives", "Zonal architecture & DIR-V briefings", "SiC/GaN efficiency studies", "ISO 26262/AIS-189 silicon implications", "Production & semiconductor consumption forecasts", "Tier-1 competitive award trackers"],
   },
 
@@ -967,6 +1135,12 @@ const DATA = {
         { p: "Indian IT majors (KPIT, Tata Elxsi, LTTS) with OEM relationships and price aggression", why: "They win large SDV services deals on cost and account presence", sowhat: "Don't fight T&M wars; win where product IP + accountability for the integrated outcome decide" },
         { p: "OEM software captives absorbing scope", why: "OEM SW subsidiaries internalise platform work, shrinking external scope", sowhat: "Sell tools, middleware and AI products INTO the captives — make them customers, not competitors" },
       ],
+      tows: {
+        SO: "Use ETAS product IP + India SW scale (S) to win 2–3 lighthouse SDV platform deals with Indian OEMs who need full stacks (O) — referenceable wins that reposition Bosch as an SW product house.",
+        ST: "Use automotive domain corpus + product IP depth (S) to launch GenAI engineering products that IT majors' T&M delivery models cannot replicate (T) — compete on outcomes, not headcount.",
+        WO: "Reframe the Tier-1 perception (W) through lighthouse co-development deals that put Bosch in the CDO/SW buying room (O) — let the deals do the repositioning rather than marketing alone.",
+        WT: "Mitigate middleware commoditisation + Tier-1 perception (W) against IT-major price aggression and OEM captive absorption (T) by selling tools and AI products INTO the captives — converting competitors into customers.",
+      },
       strategy: "Product-led SDV leadership: middleware + ETAS tooling + GenAI engineering products, delivered at India scale, anchored by lighthouse Indian-OEM platform deals; shape open-source rather than resist it.",
       scoreRationale: "Score 7.8: rare product-plus-scale strength combination and structural demand; weaknesses are positioning issues with active closure paths, threats are price-war traps avoidable by product strategy.",
     },
@@ -1040,6 +1214,25 @@ const DATA = {
       { d: "May 23, 2026", t: "IT major reports record automotive-software order book; pricing pressure noted", s: "Mint" },
       { d: "May 12, 2026", t: "OEM captive opens GenAI validation lab for software-defined vehicle testing", s: "Economic Times" },
     ],
+    stakeholders: [
+      { name: "Indian OEM CDOs / SW organisations", type: "oem", influence: 9, interest: 9, stance: "neutral", reasoning: "The key buying persona shift — SDV procurement moves from procurement to CDOs who benchmark against tech companies." },
+      { name: "KPIT Technologies", type: "supplier", influence: 6, interest: 7, stance: "neutral", reasoning: "Potential partner on OEM platform deals or a direct competitor in SDV services; relationship needs clarity." },
+      { name: "Eclipse SDV / AUTOSAR consortium", type: "government", influence: 6, interest: 6, stance: "ally", reasoning: "Bosch-backed open-source agenda; shaping it is preferable to fighting it." },
+      { name: "Bosch ETAS (internal)", type: "oem", influence: 8, interest: 9, stance: "ally", reasoning: "Core product IP asset for the India SW field; ETAS toolchain is the product moat." },
+    ],
+    competitors: [
+      { name: "KPIT Technologies", type: "indian-incumbent", x_price_position: 4, y_tech_depth: 7, moat: "India OEM relationships + AUTOSAR middleware", reasoning: "Strong on services and middleware; Bosch counters with ETAS product IP and integration accountability." },
+      { name: "Tata Elxsi", type: "indian-incumbent", x_price_position: 4, y_tech_depth: 7, moat: "Design + engineering services for OEMs", reasoning: "Competes on services; Bosch's product-IP dimension is the differentiator." },
+      { name: "LTIMindtree / Tech Mahindra", type: "indian-incumbent", x_price_position: 3, y_tech_depth: 6, moat: "IT scale + OEM account presence", reasoning: "Price-and-scale competitors; Bosch must not fight on T&M terms." },
+      { name: "Continental (software spin-off Elektrobit)", type: "global", x_price_position: 7, y_tech_depth: 9, moat: "AUTOSAR stack + adaptive platform leadership", reasoning: "Global peer on middleware; Bosch ETAS is the direct counterpart." },
+      { name: "Bosch (target position)", type: "global", x_price_position: 7, y_tech_depth: 9, moat: "ETAS product IP + India SW scale + GenAI engineering", reasoning: "Product IP + delivery scale + GenAI tools — a combination no rival holds entirely." },
+    ],
+    competitorWhiteSpace: "GenAI-accelerated automotive engineering products (coding, validation, testing tools trained on automotive constraints) — no incumbent has productised this yet at automotive-domain depth.",
+    suppliers: [
+      { input: "Cloud compute (AI training/inference)", supply_risk: 5, profit_impact: 6, quadrant: "leverage", reasoning: "Multi-cloud options; competitive pricing for SW workloads." },
+      { input: "Open-source SDV middleware (Eclipse)", supply_risk: 3, profit_impact: 5, quadrant: "non-critical", reasoning: "Community-maintained; low supply risk, but commoditises some Bosch middleware value." },
+      { input: "Automotive-domain LLM training data", supply_risk: 6, profit_impact: 8, quadrant: "strategic", reasoning: "Bosch's own vehicle/engineering data corpus is the scarce input; protect and leverage it." },
+    ],
     sources: ["GCC policies & engineering-export data", "OEM SDV budget disclosures", "Automotive talent-market studies", "AUTOSAR/Eclipse SDV roadmaps", "Virtual-validation impact studies", "ISO 26262/AIS-189 toolchain requirements", "Automotive SW market forecasts", "Competitive deal trackers"],
   },
 
@@ -1077,6 +1270,12 @@ const DATA = {
         { p: "Entrenched EMS champions scaling aggressively (Dixon, Kaynes, Syrma, Tata Electronics)", why: "They add capacity, win PLI, and accept margins Bosch can't", sowhat: "Don't fight for their commodity ground; hold the automotive-grade, high-reliability niche" },
         { p: "Margin dilution risk to Bosch's overall profile", why: "Even successful EMS at scale drags group margins and capital metrics", sowhat: "Cap the ambition: capacity-utilisation play plus solutions business, not an EMS empire" },
       ],
+      tows: {
+        SO: "Use certified capacity + I4.0/I5.0 lighthouse practice (S) to win China+1 customers seeking automotive-grade manufacturing that EMS price-champions cannot offer (O) — quality certification is the scarce asset.",
+        ST: "Differentiate on I4.0 digital manufacturing + quality certifications (S) to hold the automotive-grade niche against scaling EMS champions (T) who cannot profitably serve high-mix certified builds.",
+        WO: "Build a dedicated MaaS commercial unit (W) to capture the powertrain-transition capacity-conversion opportunity (O) before freed ICE capacity becomes a liability rather than an asset.",
+        WT: "Cap EMS ambition to avoid margin dilution (W) against entrenched EMS champions scaling aggressively (T) by restricting to the certified/I4.0 niche — a defensible position that commodity players won't pursue.",
+      },
       strategy: "Two-track entry: (1) automotive-grade Manufacturing-as-a-Service monetising certified spare capacity for China+1 customers; (2) I4.0/I5.0 manufacturing-digitalisation solutions as a product/consulting business. No commodity EMS ambitions.",
       scoreRationale: "Score 6.4: genuinely scarce assets (certified capacity, digitalisation practice) meet a structural margin-model weakness. The strategy works only with strict scope discipline — the score prices that execution risk.",
     },
@@ -1145,6 +1344,26 @@ const DATA = {
       { d: "May 16, 2026", t: "Global Tier-1 shifts ECU assembly volumes to Indian contract manufacturer", s: "ET Auto" },
       { d: "May 05, 2026", t: "Factory-digitalisation spending survey shows record Indian capex intent", s: "Business Standard" },
     ],
+    stakeholders: [
+      { name: "Global Tier-1s / OEMs (China+1 customers)", type: "oem", influence: 9, interest: 8, stance: "ally", reasoning: "Actively seeking certified Indian manufacturing partners for supply-chain de-risking — core customer." },
+      { name: "Dixon Technologies / Kaynes / Syrma", type: "supplier", influence: 7, interest: 5, stance: "neutral", reasoning: "EMS champions who compete in commodity space; Bosch avoids their terrain but monitors for overlap." },
+      { name: "MoLEM / Make-in-India (PLI)", type: "government", influence: 7, interest: 6, stance: "ally", reasoning: "PLI incentives and policy support make Indian contract manufacturing more attractive to global players." },
+      { name: "Plant workforce unions", type: "consumer", influence: 6, interest: 7, stance: "neutral", reasoning: "MaaS conversion of ICE capacity must be managed with workforce sensitivity." },
+    ],
+    competitors: [
+      { name: "Dixon Technologies", type: "indian-incumbent", x_price_position: 3, y_tech_depth: 6, moat: "Massive electronics EMS scale + PLI wins", reasoning: "Dominates commodity EMS; Bosch avoids direct competition, targets automotive-certified niche." },
+      { name: "Kaynes Technology", type: "indian-incumbent", x_price_position: 4, y_tech_depth: 6, moat: "ESDM focus + growing automotive share", reasoning: "Moving toward automotive; Bosch holds the certified/quality edge." },
+      { name: "Tata Electronics", type: "indian-incumbent", x_price_position: 5, y_tech_depth: 7, moat: "Apple supply chain + Tata group scale", reasoning: "High-visibility contract manufacturer; targets different segments from Bosch's automotive niche." },
+      { name: "Jabil / Flex (global EMS)", type: "global", x_price_position: 6, y_tech_depth: 7, moat: "Global automotive EMS + IATF certifications", reasoning: "Closest overlap; Bosch counters with I4.0 digitalisation as a product, not just manufacturing." },
+      { name: "Bosch (target position)", type: "global", x_price_position: 7, y_tech_depth: 8, moat: "IATF-certified capacity + I4.0 lighthouse + India footprint", reasoning: "Automotive-grade + digitalisation depth — a niche no pure EMS player occupies." },
+    ],
+    competitorWhiteSpace: "Automotive-grade certified MaaS + I4.0 manufacturing digitalisation as a product — the combination of certified capacity AND a deployable digitalisation practice is unique to Bosch in India.",
+    suppliers: [
+      { input: "Electronic components (passives, ICs)", supply_risk: 5, profit_impact: 6, quadrant: "leverage", reasoning: "Managed through Bosch global procurement; competitive supply." },
+      { input: "Automotive-qualified sub-assemblies", supply_risk: 6, profit_impact: 7, quadrant: "bottleneck", reasoning: "Specialised qualified sub-suppliers are limited in India; concentration risk." },
+      { input: "I4.0 software platforms (SAP, Siemens)", supply_risk: 5, profit_impact: 7, quadrant: "strategic", reasoning: "Digital-manufacturing platforms are strategic; Bosch's internal tools are the proprietary layer." },
+      { input: "Plant utilities (power, water)", supply_risk: 3, profit_impact: 4, quadrant: "non-critical", reasoning: "Commodity; managed through local plant operations." },
+    ],
     sources: ["PLI disbursement & China+1 flows", "EMS player financials & margins", "Manufacturing employment policy notes", "I4.0/I5.0 adoption studies", "BRSR/green-manufacturing requirements", "IATF/liability frameworks", "EMS market forecasts", "Capacity announcement trackers"],
   },
 
@@ -1182,6 +1401,12 @@ const DATA = {
         { p: "Fintech giants or NPCI itself standardising in-vehicle payment", why: "If the rails standardise a generic solution, the enablement premium collapses", sowhat: "Move early; anchor differentiation in automotive-grade security & UX, not payment processing" },
         { p: "OEM captives building fintech subsidiaries", why: "OEM finance arms may internalise vehicle commerce", sowhat: "Position as their enabling infrastructure too — captives are customers in this strategy" },
       ],
+      tows: {
+        SO: "Use vehicle-side trust + OEM platform relationships (S) to build the reference in-vehicle UPI implementation with NPCI partners (O) before the socket standardises and the enablement premium disappears.",
+        ST: "Use secure-ECU + automotive-grade security depth (S) to anchor differentiation in the tamper-resistant hardware layer (T) that fintech giants entering from outside the vehicle cannot replicate.",
+        WO: "Partner banks/insurers from day one (W) to capture the UBI insurance and EV-financing data-product opportunity (O) without requiring financial licences — own the data layer, outsource the regulated activity.",
+        WT: "Mitigate no-licences + no-consumer-brand (W) against fintech giants standardising rails and OEM captives internalising commerce (T) by moving early to lock the vehicle-side enablement infrastructure before it becomes a commodity API.",
+      },
       strategy: "Enable, never bank: own in-vehicle payment & identity infrastructure (UPI, secure elements, Vehicle-Aadhar-class identity) and verified-data products for insurers/lenders, with regulated activities always carried by licensed partners.",
       scoreRationale: "Score 6.0: a genuinely unique vehicle-side position offset by a hard regulatory boundary. The strategy converts the boundary into a partnership structure — workable but execution-sensitive.",
     },
@@ -1247,6 +1472,24 @@ const DATA = {
       { d: "May 15, 2026", t: "EV charging network integrates auto-pay; OEM cockpit integration announced", s: "ET Auto" },
       { d: "May 03, 2026", t: "VAHAN-linked digital vehicle-identity consultation paper circulated", s: "Business Standard" },
     ],
+    stakeholders: [
+      { name: "NPCI (UPI / FASTag / AA)", type: "government", influence: 9, interest: 7, stance: "ally", reasoning: "NPCI's open-payment rails and AA framework are the enablement infrastructure Bosch builds on — policy ally." },
+      { name: "RBI / IRDAI", type: "regulator", influence: 9, interest: 5, stance: "neutral", reasoning: "Regulate the licensed activities Bosch must not carry; set the perimeter for the enable-never-bank strategy." },
+      { name: "Banks & insurers (HDFC, ICICI, Bajaj Allianz)", type: "oem", influence: 7, interest: 7, stance: "ally", reasoning: "Need vehicle-verified data for UBI and EV-financing products; natural distribution partners." },
+      { name: "PV OEMs (platform teams)", type: "oem", influence: 8, interest: 7, stance: "neutral", reasoning: "Cockpit/platform decisions determine where in-vehicle payment sits; must bundle with existing platform deals." },
+    ],
+    competitors: [
+      { name: "PhonePe / PayU (fintech players)", type: "startup", x_price_position: 3, y_tech_depth: 6, moat: "Network effects + UPI integration + consumer brand", reasoning: "Own the consumer payment layer; Bosch's angle is the automotive-grade vehicle-side hardware they can't build." },
+      { name: "Juspay (payment orchestration)", type: "startup", x_price_position: 4, y_tech_depth: 7, moat: "Payment-SDK + OEM integrations (Ola, Navi)", reasoning: "Closest competitor in automotive payment orchestration; Bosch's secure-element hardware is the differentiator." },
+      { name: "IEX / vehicle fintech startups", type: "startup", x_price_position: 4, y_tech_depth: 6, moat: "EV financing and insurance data plays", reasoning: "Compete on data products; Bosch's vehicle-verified sensor data is higher quality." },
+      { name: "Bosch (target position)", type: "global", x_price_position: 7, y_tech_depth: 8, moat: "Secure ECU + cockpit integration + OEM relationships", reasoning: "Owns the vehicle-side trust layer that fintech players rent — structural moat." },
+    ],
+    competitorWhiteSpace: "Automotive-grade secure in-vehicle payment infrastructure (tamper-resistant ECU + certified UPI integration) — fintech players can't build it; Bosch already has the hardware and OEM access.",
+    suppliers: [
+      { input: "Secure elements / HSMs", supply_risk: 6, profit_impact: 8, quadrant: "strategic", reasoning: "Infineon/NXP secure elements for in-vehicle payment; limited qualified suppliers." },
+      { input: "NPCI APIs / UPI stack", supply_risk: 3, profit_impact: 7, quadrant: "leverage", reasoning: "Open government APIs; low supply risk, high value enablement." },
+      { input: "Telematics / connectivity hardware", supply_risk: 5, profit_impact: 6, quadrant: "leverage", reasoning: "Shared with Connectivity field; managed jointly." },
+    ],
     sources: ["NPCI/UPI/FASTag/AA architecture", "Vehicle-linked financial-flow data", "Payment-behaviour studies", "Secure-element & identity briefings", "EV-financing risk analyses", "RBI/IRDAI perimeter guidance", "Enablement-market estimates", "Fintech competitive trackers"],
   },
 
@@ -1284,6 +1527,12 @@ const DATA = {
         { p: "Indian system integrators + global ITS rivals locking consortium slots", why: "MLFF consortia are forming now; technology-partner slots are finite", sowhat: "Secure consortium positions within 12 months or watch the window close" },
         { p: "L1 price-bias squeezing technology margins", why: "Lowest-bid procurement rewards cost-cutters over technology depth", sowhat: "Anchor differentiation in lifecycle performance guarantees, not capex price" },
       ],
+      tows: {
+        SO: "Use global MLFF/ITS heritage + vehicle-side V2X readiness (S) to secure the technology-provider role in Indian MLFF consortia (O) before those consortium slots close — asymmetric upside from the system replacement.",
+        ST: "Use the both-sides-of-the-air-gap V2X story + MLFF heritage (S) to anchor lifecycle-performance differentiation against L1 price-bias (T) — guarantee outcomes rather than competing on capex price.",
+        WO: "Overcome thin India B2G track record (W) by embedding in established Indian-prime-led consortia for the MLFF transition (O) — let the prime carry procurement risk while Bosch supplies the technology advantage.",
+        WT: "Offset thin B2G muscle + long sales cycles (W) against window-closing consortium formation and price-bias procurement (T) by securing consortium positions within 12 months and balancing portfolio with faster-cycle commercial charging-data revenue.",
+      },
       strategy: "Consortium-led: technology provider inside Indian-prime-led MLFF and ITS consortia; both-sides V2X packaging; commercial charging-map data services as the fast-cycle balance.",
       scoreRationale: "Score 6.4: real technology leadership meeting a hard procurement reality. The MLFF window is the asymmetric upside; B2G execution risk is the persistent drag.",
     },
@@ -1353,6 +1602,24 @@ const DATA = {
       { d: "May 17, 2026", t: "OEM partners with map provider for real-time charger availability data", s: "Mint" },
       { d: "May 06, 2026", t: "Smart-city mission review prioritises traffic-management and enforcement tech", s: "Business Standard" },
     ],
+    stakeholders: [
+      { name: "NHAI / MoRTH", type: "government", influence: 10, interest: 8, stance: "ally", reasoning: "MLFF policy and highway ITS investments are the primary market-creation mechanism; policy ally." },
+      { name: "Smart city / urban traffic bodies (MoHUA)", type: "government", influence: 7, interest: 6, stance: "ally", reasoning: "Urban ITS and V2X corridor pilots are co-driven with smart-city programmes." },
+      { name: "Indian system integrators (BEL, L&T, Tata Projects)", type: "supplier", influence: 8, interest: 7, stance: "neutral", reasoning: "Potential consortium prime partners who provide B2G relationships and procurement track record Bosch lacks." },
+      { name: "Fleet operators & CPOs", type: "oem", influence: 6, interest: 7, stance: "ally", reasoning: "Commercial charging-map data services customers — faster revenue cycle than B2G." },
+    ],
+    competitors: [
+      { name: "Kapsch TrafficCom", type: "global", x_price_position: 8, y_tech_depth: 8, moat: "MLFF/GNSS tolling IP + global deployments", reasoning: "Closest global ITS rival; Bosch's both-sides V2X story is the differentiation." },
+      { name: "Q-Free / Redflex", type: "global", x_price_position: 7, y_tech_depth: 7, moat: "Tolling and enforcement hardware + software", reasoning: "Compete on tolling systems; Bosch adds vehicle-side dimension they lack." },
+      { name: "BEL (Bharat Electronics)", type: "indian-incumbent", x_price_position: 5, y_tech_depth: 6, moat: "DPSU procurement relationships + domestic preference", reasoning: "Government procurement incumbent; Bosch needs them as a consortium partner, not a competitor." },
+      { name: "Bosch (target position)", type: "global", x_price_position: 7, y_tech_depth: 8, moat: "MLFF heritage + both-sides V2X (vehicle + infra)", reasoning: "Unique both-sides-of-the-air-gap position — no competitor covers vehicle-side AND infrastructure-side." },
+    ],
+    competitorWhiteSpace: "Both-sides V2X technology (vehicle-side OBU + infrastructure-side RSU + cloud backend) from one supplier — no incumbent owns all three; Bosch's cross-field assets make this uniquely credible.",
+    suppliers: [
+      { input: "GNSS OBU hardware", supply_risk: 5, profit_impact: 7, quadrant: "leverage", reasoning: "Multiple automotive-grade GNSS suppliers; manageable." },
+      { input: "RSU (Road-Side Unit) electronics", supply_risk: 6, profit_impact: 7, quadrant: "bottleneck", reasoning: "C-V2X RSU hardware is a specialised supply; limited certified vendors in India." },
+      { input: "Cloud ITS backend infrastructure", supply_risk: 4, profit_impact: 7, quadrant: "leverage", reasoning: "AWS/Azure infrastructure; multi-cloud possible." },
+    ],
     sources: ["NHAI MLFF policy & pilots", "Infrastructure capex allocations", "Congestion & road-safety data", "C-V2X standards & corridor pilots", "EV charging-data quality studies", "B2G procurement rules", "ITS market forecasts", "Consortium & tender trackers"],
   },
 
@@ -1390,6 +1657,12 @@ const DATA = {
         { p: "Pure-play recyclers & startups integrating diagnostics themselves", why: "Recyclers (Attero/Lohum-class) add grading/diagnostics to capture more value", sowhat: "Move first on the data layer; partner with recyclers before they build it" },
         { p: "Policy/standard volatility undermining business cases", why: "Immature carbon and EPR mechanics can shift, stranding investments", sowhat: "Standards-agnostic platforms; avoid mechanism-specific bets" },
       ],
+      tows: {
+        SO: "Use battery diagnostics + workshop network (S) to be the first-mover in battery traceability-as-a-service when EPR enforcement mandates compliance (O) — regulation guarantees demand and Bosch has the only physical + data infrastructure.",
+        ST: "Use workshop data depth + cross-field battery assets (S) against recyclers integrating diagnostics (T) by embedding the Bosch data layer before they build comparable grading capability in-house.",
+        WO: "Overcome no-recycling-process franchise (W) by partnering recyclers for chemistry and plant while owning the second-life grading and diagnostics layer they depend on (O) — complementary rather than competitive.",
+        WT: "Mitigate nascent markets + policy dependence (W) against standard volatility and recycler integration (T) by building standards-agnostic platforms and committing capital only when EPR-enforcement triggers actually fire.",
+      },
       strategy: "Own the data & diagnostics layer of circularity (battery traceability, second-life grading, residual valuation) using the workshop network; partner recyclers for process; build standards-agnostic platforms; scale on EPR-enforcement triggers.",
       scoreRationale: "Score 5.8: distinctive workshop+data strengths and strong BBM-stream alignment, but nascent markets and policy-dependence cap the near-term case. A patient, optionality-rich position.",
     },
@@ -1455,6 +1728,24 @@ const DATA = {
       { d: "May 14, 2026", t: "Right-to-Repair framework consultation extends to automotive batteries", s: "Business Standard" },
       { d: "May 04, 2026", t: "Fleet operator pilots battery-health-based residual valuation for resale", s: "ET Auto" },
     ],
+    stakeholders: [
+      { name: "MoEFCC / CPCB (EPR enforcement)", type: "regulator", influence: 9, interest: 7, stance: "ally", reasoning: "EPR mandate enforcement creates the compliance-traceability market Bosch is uniquely placed to serve." },
+      { name: "Battery recyclers (Attero, Lohum, Epsilon)", type: "supplier", influence: 7, interest: 7, stance: "neutral", reasoning: "Need battery diagnostics and grading data Bosch can provide; potential partners before they build it themselves." },
+      { name: "OEMs / EV makers (battery producers)", type: "oem", influence: 8, interest: 7, stance: "neutral", reasoning: "EPR obligors who need certified collection/traceability; the compliance demand driver." },
+      { name: "Second-life storage operators", type: "consumer", influence: 5, interest: 7, stance: "ally", reasoning: "Need certified graded batteries; Bosch's diagnostics platform is their quality gateway." },
+    ],
+    competitors: [
+      { name: "Attero Recycling", type: "indian-incumbent", x_price_position: 4, y_tech_depth: 6, moat: "Recycling process IP + collection network", reasoning: "Expanding into diagnostics to capture more value — the specific threat to Bosch's data layer." },
+      { name: "Lohum Cleantech", type: "indian-incumbent", x_price_position: 5, y_tech_depth: 6, moat: "Battery material recovery + second-life grading", reasoning: "Another recycler moving into diagnostics; Bosch must embed first." },
+      { name: "Epistolio / global BMS diagnostics startups", type: "startup", x_price_position: 5, y_tech_depth: 7, moat: "Battery analytics software", reasoning: "Pure-play battery analytics; Bosch's workshop network is the physical distribution advantage they lack." },
+      { name: "Bosch (target position)", type: "global", x_price_position: 7, y_tech_depth: 8, moat: "10,000-workshop network + battery diagnostics + cross-field data", reasoning: "Physical collection + digital diagnostics + Energy-field data — a combination recyclers can't replicate." },
+    ],
+    competitorWhiteSpace: "Battery traceability-as-a-service combining physical workshop collection + certified diagnostics + EPR compliance reporting — no recycler or software startup has Bosch's physical network + data depth combination.",
+    suppliers: [
+      { input: "Battery diagnostic equipment", supply_risk: 5, profit_impact: 7, quadrant: "strategic", reasoning: "Specialised EIS and state-of-health testing equipment; limited automotive-grade vendors." },
+      { input: "Traceability software platform", supply_risk: 4, profit_impact: 7, quadrant: "leverage", reasoning: "Cloud-based; multiple platform options or internal build." },
+      { input: "Workshop consumables / logistics", supply_risk: 3, profit_impact: 4, quadrant: "non-critical", reasoning: "Managed through existing Bosch service network." },
+    ],
     sources: ["Battery Waste Mgmt Rules & Right-to-Repair", "EV battery TCO & residual studies", "BRSR/scope-3 disclosure trends", "Battery diagnostics & traceability briefings", "Circular-economy mandate analyses", "Carbon-market & EPR mechanics", "Recycling/second-life market forecasts", "Competitive landscape trackers"],
   },
 
@@ -1492,6 +1783,12 @@ const DATA = {
         { p: "Aerospace-native suppliers and Tier-1s own the certified-component relationships", why: "Honeywell/Garmin-class and aerospace primes have the certification muscle and incumbency", sowhat: "Automotive transferability is necessary but not sufficient — certification incumbents lead" },
         { p: "Market may never reach scale in India this decade", why: "Regulatory, economic and social risks stack multiplicatively", sowhat: "Treat as pure optionality; avoid capital commitment until triggers fire" },
       ],
+      tows: {
+        SO: "Use propulsion + battery/thermal know-how shared with Energy (S) to engage global eVTOL primes for cargo/medical use-case component supply (O) — low-cost optionality without standalone capital commitment.",
+        ST: "Use safety-critical electronics + battery expertise (S) to stay relevant as a non-flight-critical subsystem supplier while aerospace-native incumbents own the certified component relationships (T).",
+        WO: "Overcome no-aerospace-certification (W) by targeting only non-flight-critical subsystem supply to cargo/medical UAM primes (O) — the certification barrier doesn't apply to the components Bosch can realistically supply.",
+        WT: "Mitigate no-hooks + no-certification (W) against market-scale risk and aerospace incumbency (T) by maintaining a pure watch-and-qualify posture — zero standalone capital until at least one cargo/medical use case achieves regulatory clarity in India.",
+      },
       strategy: "Watch-and-qualify only: monitor the field, maintain transferable-tech readiness via Energy/sensing investment, and engage global primes as a component supplier if cargo/medical UAM forms; no standalone capital commitment now.",
       scoreRationale: "Score 4.6: real transferable competencies cannot overcome the absence of aerospace certification, M&A hooks and a near-term market. A genuine but low-priority optionality.",
     },
@@ -1553,6 +1850,22 @@ const DATA = {
       { d: "May 22, 2026", t: "Global eVTOL prime announces India market-study partnership", s: "Mint" },
       { d: "May 11, 2026", t: "Medical-emergency drone-logistics pilot expands in hill state", s: "Business Standard" },
     ],
+    stakeholders: [
+      { name: "DGCA / MoCA (drone/UAM framework)", type: "regulator", influence: 9, interest: 6, stance: "neutral", reasoning: "Regulatory framework progress is the single biggest market trigger; currently behind most markets." },
+      { name: "Global eVTOL primes (Joby, Archer, Wisk)", type: "oem", influence: 7, interest: 6, stance: "neutral", reasoning: "Target for Bosch's component-supplier engagement; selecting partners now for the next decade." },
+      { name: "Cargo/medical logistics operators", type: "consumer", influence: 5, interest: 6, stance: "ally", reasoning: "First viable Indian use case — medical and cargo UAM avoids passenger-certification complexity." },
+    ],
+    competitors: [
+      { name: "Honeywell Aerospace", type: "global", x_price_position: 9, y_tech_depth: 10, moat: "Certified avionics + flight-critical systems", reasoning: "Aerospace incumbent; owns the certified-component relationships Bosch lacks for flight-critical supply." },
+      { name: "Garmin / Collins Aerospace", type: "global", x_price_position: 8, y_tech_depth: 9, moat: "Avionics IP + airworthiness certifications", reasoning: "Same dynamics as Honeywell; Bosch targets non-flight-critical subsystems these players don't prioritise." },
+      { name: "Bosch (target position)", type: "global", x_price_position: 6, y_tech_depth: 7, moat: "Power electronics + battery management + functional safety", reasoning: "Non-flight-critical subsystem supplier — a distinct, lower-barrier entry point than avionics." },
+    ],
+    competitorWhiteSpace: "Non-flight-critical automotive-grade subsystems (power management, battery thermal, sensor compute) for eVTOL primes — aerospace incumbents are over-specified; automotive Tier-1s have the right cost and quality profile.",
+    suppliers: [
+      { input: "Aerospace-qualified components", supply_risk: 8, profit_impact: 7, quadrant: "bottleneck", reasoning: "Very limited qualified aerospace supply chain; the certification barrier for Bosch to enter." },
+      { input: "Battery cells (high-density)", supply_risk: 7, profit_impact: 8, quadrant: "strategic", reasoning: "Aviation-grade battery energy density is beyond current automotive cells; critical gap." },
+      { input: "Power electronics (shared with Energy field)", supply_risk: 4, profit_impact: 7, quadrant: "leverage", reasoning: "Shared with Energy field investment — capital-efficient cross-leverage." },
+    ],
     sources: ["DGCA drone/UAM framework status", "UAM use-case economics studies", "Public-acceptance research", "Propulsion transferability briefings", "Battery energy-density analyses", "Aerospace certification overviews", "Speculative UAM market forecasts", "Pre-market competitive notes"],
   },
 
@@ -1590,6 +1903,12 @@ const DATA = {
         { p: "Crowded field with global robotics specialists and Chinese cost competition", why: "Established robotics OEMs and aggressive Chinese suppliers compete on platform and price", sowhat: "Differentiate via automotive-grade safety/reliability and SdV integration, not platform breadth" },
         { p: "Humanoid hype cycle risking misallocated investment", why: "Capital chases humanoids ahead of viable economics", sowhat: "Maintain WATCH discipline on humanoids; invest where revenue is real" },
       ],
+      tows: {
+        SO: "Use automotive-grade sensors/compute + SdV convergence thesis (S) to supply AMR makers today and use campus-shuttle testbeds to mature SdV autonomy simultaneously (O) — one investment serves two fields.",
+        ST: "Use safety-critical electronics reliability + SdV integration depth (S) to differentiate against Chinese cost competition and global robotics specialists (T) on automotive-grade quality that industrial customers increasingly require.",
+        WO: "Overcome no-platform franchise (W) by partnering AMR integrators and system builders to supply the sensing/compute/safety layer (O) — become the component supplier of choice rather than competing at the platform level.",
+        WT: "Maintain WATCH discipline on humanoids and avoid platform bets (W) against hype-cycle misallocation and entrenched robotics OEMs (T) by investing only where revenue is real today — AMR sensors, actuators and safety compute.",
+      },
       strategy: "Component-and-convergence strategy: supply sensors/actuators/compute/safety to AMR and industrial robotics now, use campus shuttles as an SdV-autonomy testbed, exploit robotics-SdV convergence for capital efficiency, and keep humanoids on watch.",
       scoreRationale: "Score 6.4: strong transferable tech and a capital-efficient convergence thesis, held back by the absence of a platform franchise, no hooks, and a hype-prone competitive field. Solid as an adjacency, not a standalone empire.",
     },
@@ -1658,6 +1977,25 @@ const DATA = {
       { d: "May 13, 2026", t: "Tech campus deploys autonomous low-speed shuttle pilot", s: "Mint" },
       { d: "May 02, 2026", t: "Humanoid startup raises funding; analysts caution on near-term economics", s: "Business Standard" },
     ],
+    stakeholders: [
+      { name: "Logistics & e-commerce operators (Flipkart/Amazon/Meesho warehouses)", type: "consumer", influence: 8, interest: 8, stance: "ally", reasoning: "Primary AMR buyers in India; automation demand is real and growing with logistics volumes." },
+      { name: "Industrial manufacturers (auto plants, pharma)", type: "consumer", influence: 7, interest: 7, stance: "ally", reasoning: "I5.0 and labour-cost pressure drive automation adoption; Bosch's own plants are reference customers." },
+      { name: "Campus operators (IT parks, airports, hospitals)", type: "consumer", influence: 5, interest: 6, stance: "ally", reasoning: "Campus shuttle use cases are the SdV testbed and a real commercial opportunity." },
+      { name: "MoLEM / Make-in-India", type: "government", influence: 6, interest: 5, stance: "ally", reasoning: "Incentives for automation manufacturing; policy supports the robotics supply chain Bosch is part of." },
+    ],
+    competitors: [
+      { name: "ABB Robotics", type: "global", x_price_position: 8, y_tech_depth: 9, moat: "Industrial robot portfolio + safety systems", reasoning: "Industrial robot leader; Bosch supplies sensors/safety compute to the same platforms rather than competing." },
+      { name: "Kuka / Fanuc", type: "global", x_price_position: 8, y_tech_depth: 9, moat: "Robot arm IP + automotive integration", reasoning: "Same positioning — Bosch is their component/safety supplier, not a direct rival." },
+      { name: "GreyOrange / Addverb (Indian AMR)", type: "indian-incumbent", x_price_position: 5, y_tech_depth: 7, moat: "India-built AMR + logistics customer relationships", reasoning: "AMR platform makers who need automotive-grade sensors and safety compute — natural customers." },
+      { name: "Boston Dynamics / Figure AI (humanoids)", type: "global", x_price_position: 9, y_tech_depth: 10, moat: "Humanoid platform IP + massive funding", reasoning: "WATCH tier; Bosch tracks but does not invest ahead of viable humanoid economics." },
+      { name: "Bosch (target position)", type: "global", x_price_position: 6, y_tech_depth: 8, moat: "Automotive-grade sensors + safety compute + SdV convergence", reasoning: "Component/subsystem supplier to AMR/industrial makers — picks-and-shovels position." },
+    ],
+    competitorWhiteSpace: "Automotive-grade safety-certified sensor + compute modules for AMR and industrial robotics — consumer-grade robot sensors lack the reliability; Bosch brings automotive safety culture to an industry that needs it.",
+    suppliers: [
+      { input: "LiDAR / ToF sensors", supply_risk: 6, profit_impact: 7, quadrant: "strategic", reasoning: "Key AMR perception input; Bosch plus Velodyne/Ouster; manage supply continuity." },
+      { input: "Motor controllers / servo drives", supply_risk: 5, profit_impact: 6, quadrant: "leverage", reasoning: "Multiple vendors; competitive." },
+      { input: "Safety MCUs (IEC 61508 / ISO 13849)", supply_risk: 6, profit_impact: 7, quadrant: "strategic", reasoning: "Functional-safety silicon for robot safety functions; shared with automotive supply chain." },
+    ],
     sources: ["Make-in-India & automation incentives", "Warehouse/logistics automation studies", "Automation-employment research", "Robotics-SDV convergence briefings", "Mobile-robot powertrain analyses", "Robot safety-standard status", "Robotics market forecasts", "Competitive & funding trackers"],
   },
 
@@ -1695,6 +2033,12 @@ const DATA = {
         { p: "Entrenched DPSUs and defence primes own the relationships and clearances", why: "BEL/HAL-class and private primes (L&T, Tata, Adani Defence) hold incumbency and clearance depth", sowhat: "Position as a component/manufacturing partner to them — not a competitor" },
         { p: "Export-control and clearance complexity for a multinational", why: "Foreign-parent considerations complicate controlled-technology participation", sowhat: "Structure participation through the Indian entity with appropriate compliance" },
       ],
+      tows: {
+        SO: "Use certified manufacturing + high-reliability sensing (S) to capture dual-use component and MaaS slots opened by indigenisation mandates and defence-corridor incentives (O) — no prime-contractor risk, just component supply.",
+        ST: "Use certified manufacturing quality + MaaS synergy (S) to position as a reliable component/manufacturing partner TO established DPSUs and primes (T) rather than competing with them — converts the threat into a channel.",
+        WO: "Overcome no-defence-clearances (W) by partnering DPSUs/established primes who provide clearance access and procurement relationships (O) needed to capture indigenisation opportunities.",
+        WT: "Mitigate no-hooks + clearance absence (W) against DPSU incumbency and export-control complexity (T) by restricting to component supply and MaaS through Indian-entity structures with established partners only — patient and bounded.",
+      },
       strategy: "Partnership-led, dual-use only: supply high-reliability components and qualified contract manufacturing to defence primes/DPSUs, leveraging the Manufacturing-field MaaS thesis; never pursue prime-contractor or weapons-system roles; manage clearance/export-control via the India entity.",
       scoreRationale: "Score 5.8: real manufacturing/sensing strengths and a strong indigenisation tailwind, offset by the absence of clearances, certification and procurement craft, plus no hooks. A patient, partnership-bounded adjacency.",
     },
@@ -1758,6 +2102,24 @@ const DATA = {
       { d: "May 15, 2026", t: "Defence corridor announces incentives for high-reliability manufacturing units", s: "Mint" },
       { d: "May 05, 2026", t: "DPSU issues RFI for dual-use sensor and power-electronics components", s: "ET Auto" },
     ],
+    stakeholders: [
+      { name: "MoD / DDP (Dept of Defence Production)", type: "government", influence: 10, interest: 6, stance: "neutral", reasoning: "Indigenisation policy and positive-list mandates create the component-supply opportunity; must understand procurement rules." },
+      { name: "DPSUs (BEL, BDL, HAL, DRDO)", type: "oem", influence: 8, interest: 7, stance: "neutral", reasoning: "Primary system integrators for indigenised defence; Bosch's target consortium partners." },
+      { name: "Private defence primes (L&T, Tata Advanced Systems, Adani Defence)", type: "oem", influence: 8, interest: 7, stance: "neutral", reasoning: "Growing private-prime ecosystem; more commercially flexible than DPSUs." },
+      { name: "Bosch legal / export-control compliance", type: "oem", influence: 7, interest: 8, stance: "ally", reasoning: "Internal stakeholder who gates any defence participation; must structure through India entity." },
+    ],
+    competitors: [
+      { name: "BEL (Bharat Electronics)", type: "indian-incumbent", x_price_position: 5, y_tech_depth: 7, moat: "DPSU relationships + government procurement incumbency", reasoning: "The prime system-integrator Bosch partners with, not competes against." },
+      { name: "L&T Defence / L&T Technology Services", type: "indian-incumbent", x_price_position: 6, y_tech_depth: 7, moat: "Prime-contractor credentials + EPC experience", reasoning: "Same dynamic as BEL — Bosch's component/MaaS offer fits their supply chain." },
+      { name: "ELBIT / Thales (global defence Tier-1s)", type: "global", x_price_position: 8, y_tech_depth: 9, moat: "Defence-certified systems + government clearances", reasoning: "Not direct competitors — Bosch is not a prime; they are potential system partners." },
+      { name: "Bosch (target position)", type: "global", x_price_position: 6, y_tech_depth: 7, moat: "High-reliability electronics + certified manufacturing + India entity", reasoning: "Component/MaaS supplier inside prime-led consortia — bounded but defensible." },
+    ],
+    competitorWhiteSpace: "Automotive-grade ruggedised electronics and certified contract manufacturing for indigenised defence programmes — existing defence suppliers lack Bosch's electronics depth; Bosch fills a genuine capability gap.",
+    suppliers: [
+      { input: "Ruggedised electronic components", supply_risk: 7, profit_impact: 7, quadrant: "strategic", reasoning: "MIL-grade components are a constrained supply; manage via defence-qualified distributor relationships." },
+      { input: "Specialised manufacturing equipment", supply_risk: 6, profit_impact: 6, quadrant: "bottleneck", reasoning: "Defence-specification tooling is concentrated with few certified vendors." },
+      { input: "Raw materials (special alloys, PCB substrates)", supply_risk: 5, profit_impact: 5, quadrant: "leverage", reasoning: "Manageable through global Bosch procurement." },
+    ],
     sources: ["Indigenisation lists & offset policy", "Defence budget & domestic-procurement data", "Self-reliance policy notes", "Dual-use technology overlap briefings", "Ruggedisation/reliability standards", "Clearance & export-control frameworks", "Defence-electronics market analyses", "Prime/DPSU sourcing trackers"],
   },
 
@@ -1795,6 +2157,12 @@ const DATA = {
         { p: "Telematics specialists and medtech players occupying adjacent space", why: "Emergency-response telematics and digital-health players move toward the vehicle", sowhat: "Differentiate via automotive-grade integration and safety reliability" },
         { p: "Regulatory distance of medical features risks over-investment", why: "Clinical-grade ambitions can sink capital into long regulatory pathways", sowhat: "Hold the wellness/safety line; partner for anything clinical" },
       ],
+      tows: {
+        SO: "Use e-call/crash-sensing + in-cabin sensing assets (S) to position as the certified e-call stack supplier before the mandate lands (O) — regulation-guaranteed demand with existing competency.",
+        ST: "Use automotive-grade integration + sensing reliability (S) to differentiate against telematics specialists and medtech players occupying adjacent space (T) who lack the vehicle-embedded integration depth.",
+        WO: "Overcome no-medical-competency (W) by partnering medical-device players for clinical components to capture the e-call opportunity with clinically-validated elements (O) without building a regulatory pathway from scratch.",
+        WT: "Hold the wellness/safety line and avoid clinical-grade capital bets (W) against regulatory-distance risk and medtech specialists (T) — the e-call wedge is the only near-term scope worth committing resources to.",
+      },
       strategy: "Lead the mandated e-call slice with existing sensing/connectivity assets; reuse Interior-Systems sensing for wellness (non-medical) features; build inclusive-design as a procurement differentiator; partner medical-device players for any clinical-grade ambition; treat broader mobility-health as social-impact optionality.",
       scoreRationale: "Score 5.6: a real regulation-pulled e-call wedge and capital-efficient sensing reuse, but the field beyond e-call is diffuse, hard to monetise and regulatorily distant. EXPLORE on the wedge, watch the rest.",
     },
@@ -1858,6 +2226,24 @@ const DATA = {
       { d: "May 25, 2026", t: "OEM pilots in-cabin wellness monitoring (non-medical) in premium SUV", s: "Autocar India" },
       { d: "May 14, 2026", t: "Public-transport tender adds accessibility/inclusive-design criteria", s: "Mint" },
       { d: "May 03, 2026", t: "Medtech firm partners with telematics provider on vehicle-linked emergency response", s: "Business Standard" },
+    ],
+    stakeholders: [
+      { name: "MoRTH / TRAI (e-call mandate)", type: "regulator", influence: 9, interest: 6, stance: "ally", reasoning: "E-call mandate is the primary demand trigger; Bosch's connectivity + sensing assets are the implementation path." },
+      { name: "CDSCO (medical device regulator)", type: "regulator", influence: 7, interest: 4, stance: "neutral", reasoning: "Clinical-grade features require CDSCO pathways; Bosch stays below this threshold intentionally." },
+      { name: "PV OEMs (safety/connectivity teams)", type: "oem", influence: 8, interest: 6, stance: "neutral", reasoning: "Platform decisions for e-call integration; Bosch must bundle with connectivity and sensing platform deals." },
+      { name: "Medical-device partners (GE Healthcare, Philips, domestic medtech)", type: "supplier", influence: 6, interest: 6, stance: "ally", reasoning: "Partners for any clinical-grade feature ambition; Bosch provides the vehicle side, they provide the medical validation." },
+    ],
+    competitors: [
+      { name: "Telit / Sierra Wireless (telematics modules)", type: "global", x_price_position: 6, y_tech_depth: 7, moat: "Telematics module IP + global OEM certifications", reasoning: "e-call telematics competitors; Bosch's sensor-fusion integration is the differentiator." },
+      { name: "Stoneridge / Continental (e-call systems)", type: "global", x_price_position: 7, y_tech_depth: 8, moat: "e-call system integration + OEM relationships", reasoning: "Most direct e-call competitors; Bosch bundles with broader connectivity/sensing platform." },
+      { name: "Withings / digital-health startups", type: "startup", x_price_position: 5, y_tech_depth: 7, moat: "Consumer wellness sensors + health data platforms", reasoning: "Entering vehicle wellness space from consumer side; Bosch counters with automotive-grade reliability." },
+      { name: "Bosch (target position)", type: "global", x_price_position: 6, y_tech_depth: 8, moat: "Crash sensing + connectivity + Interior-Systems sensing reuse", reasoning: "Cross-field sensing reuse (Interior + Connectivity) creates a lower-cost, higher-quality e-call bundle." },
+    ],
+    competitorWhiteSpace: "Integrated e-call + driver wellness sensing as a bundled OEM-line feature reusing Interior-Systems radar and Connectivity assets — pure e-call players lack the sensing depth; wellness players lack the vehicle integration.",
+    suppliers: [
+      { input: "Emergency SIM / eSIM for e-call", supply_risk: 5, profit_impact: 7, quadrant: "strategic", reasoning: "eSIM for dedicated e-call bearer; limited certified vendors — critical for mandate compliance." },
+      { input: "In-cabin radar (shared with Interior Systems)", supply_risk: 4, profit_impact: 7, quadrant: "leverage", reasoning: "Cross-field shared supply — leverages Interior-Systems investment." },
+      { input: "PSAP / 112 backend integration", supply_risk: 6, profit_impact: 6, quadrant: "bottleneck", reasoning: "Government PSAP integration is a bottleneck; must be certified by regulatory bodies." },
     ],
     sources: ["E-call/112 integration policy", "Healthcare-access & mobility studies", "DEI/accessibility procurement norms", "In-cabin vitals-sensing briefings", "(limited environmental relevance)", "CDSCO & DPDP health-data rules", "Mobility-health niche forecasts", "Adjacent competitive trackers"],
   },
@@ -1995,13 +2381,14 @@ const Methodology = ({ compact }) => (
   </div>
 );
 
-const TABS = ["Recommendation", "PESTEL", "SWOT", "Market", "Attractiveness", "Competency", "3 Horizons", "Recent Activity", "Methodology"];
+const TABS = ["Recommendation", "PESTEL", "SWOT", "Market", "Attractiveness", "Competency", "Stakeholders", "Competitors", "Suppliers", "3 Horizons", "Recent Activity", "Methodology"];
 
 export default function App() {
-  const [fieldId, setFieldId] = useState("energy");
+  const [fieldId, setFieldId] = useState("lighting");
   const [sub, setSub] = useState("All");
   const [tab, setTab] = useState("Recommendation");
   const [showWorking, setShowWorking] = useState(true);
+  const [swotView, setSwotView] = useState("swot"); // "swot" | "tows"
   const field = FIELDS.find(f => f.id === fieldId);
   const d = DATA[fieldId];
   const hasData = !!d;
@@ -2163,7 +2550,7 @@ export default function App() {
                     <Card key={k} title={k}>
                       {pts.map((x, i) => (
                         <Reasoned key={i} point={x.p} why={x.why} sowhat={x.sowhat} cites={x.c}
-                          tag={<Chip tone={x.i === "high" ? "red" : x.i === "medium" ? "amber" : "slate"}>{x.i}</Chip>} />
+                          tag={<span className="flex gap-1">{x.enabler && <Chip tone="violet">enabler</Chip>}<Chip tone={x.i === "high" ? "red" : x.i === "medium" ? "amber" : "slate"}>{x.i}</Chip></span>} />
                       ))}
                     </Card>
                   ))}
@@ -2172,6 +2559,30 @@ export default function App() {
 
               {/* ─────────────── SWOT ─────────────── */}
               {tab === "SWOT" && (
+                <>
+                <div className="flex gap-1 mb-3">
+                  <button onClick={() => setSwotView("swot")} className={`px-3 py-1 rounded-full text-xs font-medium border ${swotView === "swot" ? "bg-slate-900 text-white border-slate-900" : "bg-white border-slate-300 text-slate-600"}`}>SWOT (factors)</button>
+                  <button onClick={() => setSwotView("tows")} className={`px-3 py-1 rounded-full text-xs font-medium border ${swotView === "tows" ? "bg-slate-900 text-white border-slate-900" : "bg-white border-slate-300 text-slate-600"}`}>TOWS (strategies)</button>
+                </div>
+                {swotView === "tows" && d.swot.tows && (
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
+                    {[
+                      ["SO — Strengths × Opportunities", "Use internal strengths to exploit external opportunities", d.swot.tows.SO, "green"],
+                      ["ST — Strengths × Threats", "Use internal strengths to avoid or minimise external threats", d.swot.tows.ST, "teal"],
+                      ["WO — Weaknesses × Opportunities", "Overcome internal weaknesses by exploiting external opportunities", d.swot.tows.WO, "amber"],
+                      ["WT — Weaknesses × Threats", "Overcome internal weaknesses and minimise external threats", d.swot.tows.WT, "red"],
+                    ].map(([title, sub, body, tone]) => (
+                      <div key={title} className="bg-white rounded-xl border border-slate-200 shadow-sm overflow-hidden">
+                        <div className="px-4 py-2 border-b border-slate-100">
+                          <div className="text-sm font-bold">{title}</div>
+                          <div className="text-[11px] text-slate-500">{sub}</div>
+                        </div>
+                        <div className="p-4 flex gap-2"><Chip tone={tone}>{title.slice(0,2)}</Chip><p className="text-sm text-slate-700">{body}</p></div>
+                      </div>
+                    ))}
+                  </div>
+                )}
+                {swotView === "swot" && (
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   {[["Strengths", d.swot.S, "green"], ["Weaknesses", d.swot.W, "red"], ["Opportunities", d.swot.O, "teal"], ["Threats", d.swot.T, "amber"]].map(([t, items, tone]) => (
                     <Card key={t} title={`${t} — Bosch Mobility India`}>
@@ -2182,12 +2593,14 @@ export default function App() {
                     </Card>
                   ))}
                   <div className="md:col-span-2">
-                    <Card title="Targeted strategy & how the SWOT score (6.8) was reached">
+                    <Card title="Targeted strategy & how the SWOT score was reached">
                       <p className="text-sm mb-2">{d.swot.strategy}</p>
                       <div className="text-xs text-slate-600 bg-slate-50 rounded-lg p-3"><b>Score rationale:</b> {d.swot.scoreRationale}</div>
                     </Card>
                   </div>
                 </div>
+                )}
+                </>
               )}
 
               {/* ─────────────── MARKET ─────────────── */}
@@ -2297,6 +2710,104 @@ export default function App() {
                       </div>
                     ))}
                   </div>
+                </div>
+              )}
+
+              {/* ─────────────── STAKEHOLDERS (Stakeholder Radar) ─────────────── */}
+              {tab === "Stakeholders" && d.stakeholders && (
+                <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
+                  <Card title="Stakeholder map — influence × interest">
+                    <ResponsiveContainer width="100%" height={320}>
+                      <ScatterChart margin={{ top: 10, right: 20, bottom: 30, left: 10 }}>
+                        <XAxis type="number" dataKey="interest" name="Interest" domain={[0, 10]} tick={{ fontSize: 11 }} label={{ value: "Interest →", position: "insideBottom", offset: -15, fontSize: 11 }} />
+                        <YAxis type="number" dataKey="influence" name="Influence" domain={[0, 10]} tick={{ fontSize: 11 }} label={{ value: "Influence →", angle: -90, position: "insideLeft", fontSize: 11 }} />
+                        <Tooltip cursor={{ strokeDasharray: "3 3" }} content={({ payload }) => payload && payload[0] ? <div className="bg-white border border-slate-200 rounded p-2 text-xs shadow"><b>{payload[0].payload.name}</b><div>infl {payload[0].payload.influence} · int {payload[0].payload.interest} · {payload[0].payload.stance}</div></div> : null} />
+                        <Scatter data={d.stakeholders}>
+                          {d.stakeholders.map((s, i) => <Cell key={i} fill={s.stance === "ally" ? "#5BAA32" : s.stance === "blocker" ? "#E20015" : "#0096A0"} />)}
+                        </Scatter>
+                      </ScatterChart>
+                    </ResponsiveContainer>
+                    <div className="text-xs text-slate-500">Green = ally · teal = neutral · red = blocker. Top-right = manage closely (high influence + interest).</div>
+                  </Card>
+                  <Card title="Stakeholders — why each matters">
+                    {d.stakeholders.map(s => (
+                      <div key={s.name} className="border border-slate-200 rounded-lg p-3 mb-2 last:mb-0">
+                        <div className="flex items-center justify-between">
+                          <span className="text-sm font-semibold">{s.name}</span>
+                          <div className="flex gap-1">
+                            <Chip tone="slate">{s.type}</Chip>
+                            <Chip tone={s.stance === "ally" ? "green" : s.stance === "blocker" ? "red" : "teal"}>{s.stance}</Chip>
+                          </div>
+                        </div>
+                        <div className="text-[11px] text-slate-400 mt-1">influence {s.influence}/10 · interest {s.interest}/10</div>
+                        <p className="text-xs text-slate-600 mt-1">{s.reasoning}</p>
+                      </div>
+                    ))}
+                  </Card>
+                </div>
+              )}
+
+              {/* ─────────────── COMPETITORS (Perceptual map) ─────────────── */}
+              {tab === "Competitors" && d.competitors && (
+                <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
+                  <Card title="Perceptual map — price position × tech depth">
+                    <ResponsiveContainer width="100%" height={320}>
+                      <ScatterChart margin={{ top: 10, right: 20, bottom: 30, left: 10 }}>
+                        <XAxis type="number" dataKey="x_price_position" name="Price" domain={[0, 10]} tick={{ fontSize: 11 }} label={{ value: "Price position (10 = premium) →", position: "insideBottom", offset: -15, fontSize: 11 }} />
+                        <YAxis type="number" dataKey="y_tech_depth" name="Tech depth" domain={[0, 10]} tick={{ fontSize: 11 }} label={{ value: "Tech depth →", angle: -90, position: "insideLeft", fontSize: 11 }} />
+                        <Tooltip cursor={{ strokeDasharray: "3 3" }} content={({ payload }) => payload && payload[0] ? <div className="bg-white border border-slate-200 rounded p-2 text-xs shadow"><b>{payload[0].payload.name}</b><div>{payload[0].payload.moat}</div></div> : null} />
+                        <Scatter data={d.competitors}>
+                          {d.competitors.map((cmp, i) => <Cell key={i} fill={/target/i.test(cmp.name) || /Bosch/.test(cmp.name) ? "#E20015" : cmp.type === "global" ? "#7A1FA2" : cmp.type === "startup" ? "#0096A0" : "#94A3B8"} />)}
+                        </Scatter>
+                      </ScatterChart>
+                    </ResponsiveContainer>
+                    <div className="text-xs text-slate-500">Red = Bosch (target) · violet = global · grey = Indian incumbent · teal = startup.</div>
+                    {d.competitorWhiteSpace && <div className="text-xs text-slate-600 bg-teal-50 rounded-lg p-3 mt-2"><b>White space:</b> {d.competitorWhiteSpace}</div>}
+                  </Card>
+                  <Card title="Competitors — position & MOAT">
+                    {d.competitors.map(cmp => (
+                      <div key={cmp.name} className="border border-slate-200 rounded-lg p-3 mb-2 last:mb-0">
+                        <div className="flex items-center justify-between">
+                          <span className="text-sm font-semibold">{cmp.name}</span>
+                          <Chip tone={cmp.type === "global" ? "violet" : cmp.type === "startup" ? "teal" : "slate"}>{cmp.type}</Chip>
+                        </div>
+                        <div className="text-[11px] text-slate-400 mt-1">price {cmp.x_price_position}/10 · tech {cmp.y_tech_depth}/10</div>
+                        <div className="text-xs text-slate-600 mt-1"><b className="text-slate-500">MOAT</b> {cmp.moat}</div>
+                        <p className="text-xs text-slate-600 mt-1">{cmp.reasoning}</p>
+                      </div>
+                    ))}
+                  </Card>
+                </div>
+              )}
+
+              {/* ─────────────── SUPPLIERS (Kraljic Matrix) ─────────────── */}
+              {tab === "Suppliers" && d.suppliers && (
+                <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
+                  <Card title="Kraljic matrix — supply risk × profit impact">
+                    <ResponsiveContainer width="100%" height={320}>
+                      <ScatterChart margin={{ top: 10, right: 20, bottom: 30, left: 10 }}>
+                        <XAxis type="number" dataKey="supply_risk" name="Supply risk" domain={[0, 10]} tick={{ fontSize: 11 }} label={{ value: "Supply risk →", position: "insideBottom", offset: -15, fontSize: 11 }} />
+                        <YAxis type="number" dataKey="profit_impact" name="Profit impact" domain={[0, 10]} tick={{ fontSize: 11 }} label={{ value: "Profit impact →", angle: -90, position: "insideLeft", fontSize: 11 }} />
+                        <Tooltip cursor={{ strokeDasharray: "3 3" }} content={({ payload }) => payload && payload[0] ? <div className="bg-white border border-slate-200 rounded p-2 text-xs shadow"><b>{payload[0].payload.input}</b><div>{payload[0].payload.quadrant}</div></div> : null} />
+                        <Scatter data={d.suppliers}>
+                          {d.suppliers.map((s, i) => <Cell key={i} fill={s.quadrant === "strategic" ? "#E20015" : s.quadrant === "bottleneck" ? "#D97706" : s.quadrant === "leverage" ? "#0096A0" : "#94A3B8"} />)}
+                        </Scatter>
+                      </ScatterChart>
+                    </ResponsiveContainer>
+                    <div className="text-xs text-slate-500">Red = strategic · amber = bottleneck · teal = leverage · grey = non-critical.</div>
+                  </Card>
+                  <Card title="Supplier inputs — strategy by quadrant">
+                    {d.suppliers.map(s => (
+                      <div key={s.input} className="border border-slate-200 rounded-lg p-3 mb-2 last:mb-0">
+                        <div className="flex items-center justify-between">
+                          <span className="text-sm font-semibold">{s.input}</span>
+                          <Chip tone={s.quadrant === "strategic" ? "red" : s.quadrant === "bottleneck" ? "amber" : s.quadrant === "leverage" ? "teal" : "slate"}>{s.quadrant}</Chip>
+                        </div>
+                        <div className="text-[11px] text-slate-400 mt-1">supply risk {s.supply_risk}/10 · profit impact {s.profit_impact}/10</div>
+                        <p className="text-xs text-slate-600 mt-1">{s.reasoning}</p>
+                      </div>
+                    ))}
+                  </Card>
                 </div>
               )}
 
